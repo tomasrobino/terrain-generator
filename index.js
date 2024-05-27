@@ -12,6 +12,7 @@ function randomSingle(max, min = 0) {
 }
 
 function updateAdjacencies(coordY, coordX) {
+    let adjAmount = 0;
     if (coordY!==0) {
         if (board[coordY-1][coordX] !== 1 && adjacenciesBoard[coordY-1, coordX] !== 1) {
             adjacenciesBoard[coordY-1, coordX] = 1;
