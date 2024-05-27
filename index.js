@@ -37,6 +37,8 @@ function updateAdjacencies(coordY, coordX) {
             adjAmount++;
         }
     }
+    
+    return adjAmount;
 }
 
 const board = new Array(HEIGHT).fill(new Array(WIDTH).fill(0));
