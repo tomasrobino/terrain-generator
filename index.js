@@ -1,6 +1,6 @@
-const WIDTH = 25;
-const HEIGHT = 25;
-const AMOUNT = 40;
+const WIDTH = 10;
+const HEIGHT = 10;
+const AMOUNT = 0.4;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -68,11 +68,13 @@ const board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
 const adjacenciesBoard = Array.from({length:HEIGHT}, () => new Uint8ClampedArray(WIDTH));
 let adjAmount = 0;
 
-const root = randomCoords(HEIGHT, WIDTH); //Root for DLA
+//const root = randomCoords(HEIGHT, WIDTH); //Root for DLA
+const root = [Math.floor(HEIGHT/2), Math.floor(WIDTH/2)];
 board[root[0]][root[1]] = 1;
 adjAmount+=updateAdjacencies(root[0], root[1]);
 adjAmount++;
 
-for (let i = 1; i < AMOUNT; i++) {
+for (let i = 1; i < HEIGHT*WIDTH*AMOUNT; i++) {
     adjAmount+=placeAdjacent(adjAmount);
 }
+console.table(board)
