@@ -1,6 +1,7 @@
 const WIDTH = 10;
 const HEIGHT = 10;
-const AMOUNT = 0.4;
+const PERCENTAGE_FILLED = 0.4;
+const STAGES_AMOUNT = 10;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -74,7 +75,7 @@ board[root[0]][root[1]] = 1;
 adjAmount+=updateAdjacencies(root[0], root[1]);
 adjAmount++;
 
-for (let i = 1; i < HEIGHT*WIDTH*AMOUNT; i++) {
+for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
     adjAmount+=placeAdjacent(adjAmount);
 }
 console.table(board)
