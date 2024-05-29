@@ -27,7 +27,7 @@ function updateAdjacencies(coordY, coordX) {
         }
     }
     if (coordX!==0) {
-        if (board[coordX][coordX-1] !== 1 && adjacenciesBoard[coordY][coordX-1] !== 1) {
+        if (board[coordY][coordX-1] !== 1 && adjacenciesBoard[coordY][coordX-1] !== 1) {
             adjacenciesBoard[coordY][coordX-1] = 1;
             adjAmount++;
         }
@@ -73,4 +73,3 @@ adjAmount++;
 for (let i = 1; i < AMOUNT; i++) {
     adjAmount+=placeAdjacent(adjAmount);
 }
-//console.log(board);
