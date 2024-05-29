@@ -1,6 +1,6 @@
-const WIDTH = 10;
-const HEIGHT = 10;
-const AMOUNT = 30;
+const WIDTH = 25;
+const HEIGHT = 25;
+const AMOUNT = 40;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -12,6 +12,7 @@ function randomSingle(max, min = 0) {
     return new Array(Math.floor( Math.random() * (max-min) + min ));
 }
 
+//Update adjacenciesBoard surrounding given coordinates
 function updateAdjacencies(coordY, coordX) {
     let adjAmount = -1;
     if (coordY!==0) {
@@ -43,13 +44,15 @@ function updateAdjacencies(coordY, coordX) {
     return adjAmount;
 }
 
+//Places tile, calls and returns updateAdjacencies()
 function placeAdjacent(adjAmount) {
-    let random = Math.floor( Math.random() * adjAmount );
     //Iterate adjacencies board, counting until finding the tile selected with a single random number
+    let random = Math.floor( Math.random() * adjAmount );
     let counter = 0;
     for (let i = 0; i < adjacenciesBoard.length; i++) {
         for (let k = 0; k < adjacenciesBoard[i].length; k++) {
             if (adjacenciesBoard[i][k]===1) {
+                //Placing tile
                 if (counter===random) {
                     adjacenciesBoard[i][k] = 0;
                     board[i][k] = 1;
