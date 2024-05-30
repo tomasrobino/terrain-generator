@@ -1,6 +1,6 @@
-const WIDTH = 10;
-const HEIGHT = 10;
-const PERCENTAGE_FILLED = 0.4;
+const WIDTH = 30;
+const HEIGHT = 30;
+const PERCENTAGE_FILLED = 0.3;
 const STAGES_AMOUNT = 10;
 
 //Returns two random integers, bounded by max and min
@@ -78,4 +78,15 @@ adjAmount++;
 for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
     adjAmount+=placeAdjacent(adjAmount);
 }
-console.table(board)
+
+
+//For testing result
+/*
+const boardPrint = structuredClone(board);
+for (let i = 0; i < boardPrint.length; i++) {
+    for (let k = 0; k < boardPrint[i].length; k++) {
+        if (boardPrint[i][k] === 1) boardPrint[i][k] = "■";
+    }
+}
+console.table(boardPrint)
+*/
