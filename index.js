@@ -1,6 +1,6 @@
-const WIDTH = 30;
-const HEIGHT = 30;
-const PERCENTAGE_FILLED = 0.3;
+const WIDTH = 25;
+const HEIGHT = 25;
+const PERCENTAGE_FILLED = 0.4;
 const STAGES_AMOUNT = 10;
 
 //Returns two random integers, bounded by max and min
@@ -48,21 +48,36 @@ function updateAdjacencies(coordY, coordX) {
 //Places tile, calls and returns updateAdjacencies()
 function placeAdjacent(adjAmount) {
     //Iterate adjacencies board, counting until finding the tile selected with a single random number
-    let random = Math.floor( Math.random() * adjAmount );
-    let counter = 0;
-    for (let i = 0; i < adjacenciesBoard.length; i++) {
-        for (let k = 0; k < adjacenciesBoard[i].length; k++) {
-            if (adjacenciesBoard[i][k]===1) {
-                //Placing tile
-                if (counter===random) {
-                    adjacenciesBoard[i][k] = 0;
-                    board[i][k] = 1;
-                    return updateAdjacencies(i, k);
+    let flag = true;
+    let aux = 0;
+    let prevAux = 0;
+    while (flag) {
+        let random = Math.floor( Math.random() * adjAmount );
+        let counter = 0;
+        for (let i = 0; i < adjacenciesBoard.length; i++) {
+            for (let k = 0; k < adjacenciesBoard[i].length; k++) {
+                if (adjacenciesBoard[i][k]===1) {
+                    //Placing tile
+                    if (counter===random) {
+                        let adjs = 0;
+                        if (i>0 && board[i-1][k]===1) adjs++;
+                        if (i<board.length-1 && board[i+1][k]===1) adjs++;
+                        if (k>0 && board[i][k-1]===1) adjs++;
+                        if (k<board[i].length-1 && board[i][k+1]===1) adjs++;
+                        if (adjs === 1 || aux-prevAux >2) {
+                            adjacenciesBoard[i][k] = 0;
+                            board[i][k] = 1;
+                            prevAux=aux;
+                            return updateAdjacencies(i, k);
+                        }
+                        aux++;
+                    }
+                    counter++;
                 }
-                counter++;
             }
         }
     }
+    
 }
 
 const board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
@@ -81,7 +96,7 @@ for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
 
 
 //For testing result
-/*
+
 const boardPrint = structuredClone(board);
 for (let i = 0; i < boardPrint.length; i++) {
     for (let k = 0; k < boardPrint[i].length; k++) {
@@ -89,4 +104,3 @@ for (let i = 0; i < boardPrint.length; i++) {
     }
 }
 console.table(boardPrint)
-*/
