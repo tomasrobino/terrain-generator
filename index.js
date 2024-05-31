@@ -84,13 +84,15 @@ function placeAdjacent(adjAmount) {
     
 }
 
-//Get root of algorithm, used in every resizing
-function placeRoot(limitH, limitW, sizeH, sizeW) {
-    const newSize = [limitH*2, limitW*2];
-    const randomH = randomSingle(newSize[0]-sizeH+1);
-    const randomW = randomSingle(newSize[1]-sizeW+1);
-    board[limitW*randomH + randomW] = 1;
-    return [randomH, randomW];
+//Get and place root of algorithm, used in every resizing
+function placeRoot(currentHeight, currentWidth, root) {
+    const random = randomSingle(Math.floor((currentHeight*currentWidth)/2));
+    for (let i = 0; i < root.length; i++) {
+        if (root[i] === 1) {
+            board[Math.floor(random/currentWidth) + random%currentWidth + i] = 1;
+        }
+    }
+    return random;
 }
 
 //let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
@@ -98,10 +100,17 @@ let board = new Uint8Array(HEIGHT*WIDTH);
 let blurryBoard = new Int16Array(board.length);
 
 //Amount of times grid will be resized
-let root = placeRoot(HEIGHT, WIDTH, 1, 1);
-for (let i = 1; i < STAGES_AMOUNT; i++) {
+for (let i = 0; i < STAGES_AMOUNT; i++) {
     const currentHeight = HEIGHT*(2**i);
     const currentWidth = WIDTH*(2**i);
+    let root;
+    if (i===0) {
+        root = placeRoot(currentHeight, currentWidth, Math.floor(currentHeight/2), Math.floor(currentWidth/2), [1]);
+    } else {
+        let newBoard = [...board];
+        board = new Uint8Array(currentHeight*currentWidth);
+        root = placeRoot(currentHeight, currentWidth, Math.floor(currentHeight/2), Math.floor(currentWidth/2), newBoard);
+    }
     for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
         let randomFlag = true;
         let random;
@@ -160,8 +169,6 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
             }
         } while (flag);
     }
-    root = placeRoot(currentHeight, currentWidth, currentHeight/2, currentWidth/2);
-    board = new Uint8Array(currentHeight*currentWidth);
 }
 
 
