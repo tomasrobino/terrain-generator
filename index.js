@@ -2,9 +2,9 @@ const savePixels = require("save-pixels");
 const ndarray = require("ndarray");
 
 
-const WIDTH = 100;
-const HEIGHT = 100;
-const PERCENTAGE_FILLED = 0.3;
+const WIDTH = 5;
+const HEIGHT = 5;
+const PERCENTAGE_FILLED = 0.4;
 const STAGES_AMOUNT = 10;
 
 //Returns two random integers, bounded by max and min
@@ -85,14 +85,20 @@ function placeAdjacent(adjAmount) {
 }
 
 const board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
-//const adjacenciesBoard = Array.from({length:HEIGHT}, () => new Uint8ClampedArray(WIDTH));
-//let adjAmount = 0;
 
-//const root = randomCoords(HEIGHT, WIDTH); //Root for DLA
-const root = [Math.floor(HEIGHT/2), Math.floor(WIDTH/2)];
-board[root[0]][root[1]] = 1;
-//adjAmount+=updateAdjacencies(root[0], root[1]);
-//adjAmount++;
+//Get root of algorithm, used in every resizing
+function placeRoot(limitH, limitV, sizeH, sizeV) {
+    const newSize = [limitH*2, limitV*2];
+    const randomH = randomSingle(newSize[0]-sizeH+1);
+    const randomV = randomSingle(newSize[1]-sizeV+1);
+    board[randomH][randomV] = 1;
+    return [randomH, randomV];
+}
+
+//Amount of times grid will be resized
+for (let i = 0; i < STAGES_AMOUNT; i++) {
+    placeRoot(HEIGHT, WIDTH, 1, 1);
+}
 
 for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
     //adjAmount+=placeAdjacent(adjAmount);
