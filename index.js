@@ -1,6 +1,10 @@
-const WIDTH = 25;
-const HEIGHT = 25;
-const PERCENTAGE_FILLED = 0.4;
+const savePixels = require("save-pixels");
+const ndarray = require("ndarray");
+
+
+const WIDTH = 100;
+const HEIGHT = 100;
+const PERCENTAGE_FILLED = 0.3;
 const STAGES_AMOUNT = 10;
 
 //Returns two random integers, bounded by max and min
@@ -64,7 +68,7 @@ function placeAdjacent(adjAmount) {
                         if (i<board.length-1 && board[i+1][k]===1) adjs++;
                         if (k>0 && board[i][k-1]===1) adjs++;
                         if (k<board[i].length-1 && board[i][k+1]===1) adjs++;
-                        if (adjs === 1 || aux-prevAux >2) {
+                        if (adjs === 1 || aux-prevAux >20) {
                             adjacenciesBoard[i][k] = 0;
                             board[i][k] = 1;
                             prevAux=aux;
@@ -97,10 +101,12 @@ for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
 
 //For testing result
 
-const boardPrint = structuredClone(board);
-for (let i = 0; i < boardPrint.length; i++) {
-    for (let k = 0; k < boardPrint[i].length; k++) {
-        if (boardPrint[i][k] === 1) boardPrint[i][k] = "■";
+//const boardPrint = structuredClone(board);
+for (let i = 0; i < board.length; i++) {
+    for (let k = 0; k < board[i].length; k++) {
+        if (board[i][k] === 1) board[i][k] = 255;
     }
 }
-console.table(boardPrint)
+
+const ndBoard = ndarray(board.flat(), [WIDTH, HEIGHT]);
+savePixels(ndBoard, "gif").pipe(process.stdout)
