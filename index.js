@@ -5,7 +5,7 @@ const ndarray = require("ndarray");
 const WIDTH = 5;
 const HEIGHT = 5;
 const PERCENTAGE_FILLED = 0.4;
-const STAGES_AMOUNT = 1;
+const STAGES_AMOUNT = 5;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -143,13 +143,13 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
             let coordX = random%currentWidth;
             if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
                 flag = false;
-                printBoard(board, currentWidth)
-                console.log(random)
-                console.log(coordY)
-                console.log(coordX)
+                //printBoard(board, currentWidth)
+                //console.log(random)
+                //console.log(coordY)
+                //console.log(coordX)
                 board[random] = 1;
-                printBoard(board, currentWidth)
-                console.log("---------------------")
+                //printBoard(board, currentWidth)
+                //console.log("---------------------")
             }
             //Choose movement direction
             let direction = randomSingle(4);
@@ -190,17 +190,16 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
             }
         } while (flag);
     }
-    console.log("Stage "+i+" done");
-    console.log(board);
+    //console.log("Stage "+i+" done");
+    //printBoard(board, currentWidth)
 }
 
 
 //For testing results
-/*
+//printBoard(board, WIDTH*(2**(STAGES_AMOUNT-1)))
 for (let i = 0; i < board.length; i++) {
     if (board[i] === 1) board[i] = 255;
 }
 
-const ndBoard = ndarray(board, [WIDTH*(2**STAGES_AMOUNT), HEIGHT*(2**STAGES_AMOUNT)]);
+const ndBoard = ndarray(board, [WIDTH*(2**(STAGES_AMOUNT-1)), HEIGHT*(2**(STAGES_AMOUNT-1))]);
 savePixels(ndBoard, "gif").pipe(process.stdout)
-*/
