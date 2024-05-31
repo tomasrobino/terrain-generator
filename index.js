@@ -103,7 +103,15 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
     const currentHeight = HEIGHT*(2**i);
     const currentWidth = WIDTH*(2**i);
     for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
-
+        let randomFlag = false;
+        let random;
+        do {
+            random = randomSingle(currentHeight*currentWidth);
+            if (board[random] !== 0) {
+                randomFlag = true;
+            }
+        } while (randomFlag);
+        board[random] = 2;
     }
     root = placeRoot(currentHeight, currentWidth, currentHeight/2, currentWidth/2);
     board = new Uint8Array(currentHeight*currentWidth);
