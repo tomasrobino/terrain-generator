@@ -5,7 +5,7 @@ const ndarray = require("ndarray");
 const WIDTH = 5;
 const HEIGHT = 5;
 const PERCENTAGE_FILLED = 0.4;
-const STAGES_AMOUNT = 10;
+const STAGES_AMOUNT = 5;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -14,7 +14,7 @@ function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
 
 //Returns one random integer, bounded by max and min
 function randomSingle(max, min = 0) {
-    return new Array(Math.floor( Math.random() * (max-min) + min ));
+    return Math.floor( Math.random() * (max-min) + min );
 }
 
 //Update adjacenciesBoard surrounding given coordinates
@@ -104,12 +104,13 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
     const currentHeight = HEIGHT*(2**i);
     const currentWidth = WIDTH*(2**i);
     let root;
+    
     if (i===0) {
-        root = placeRoot(currentHeight, currentWidth, Math.floor(currentHeight/2), Math.floor(currentWidth/2), [1]);
+        root = placeRoot(currentHeight, currentWidth, [1]);
     } else {
         let newBoard = [...board];
         board = new Uint8Array(currentHeight*currentWidth);
-        root = placeRoot(currentHeight, currentWidth, Math.floor(currentHeight/2), Math.floor(currentWidth/2), newBoard);
+        root = placeRoot(currentHeight, currentWidth, newBoard);
     }
     for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
         let randomFlag = true;
@@ -119,6 +120,7 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
             if (board[random] === 0) {
                 randomFlag = false;
             }
+            
         } while (randomFlag);
         board[random] = 2;
         
@@ -169,17 +171,17 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
             }
         } while (flag);
     }
+    console.log("Stage "+i+" done")
+    console.log(board)
 }
 
 
 //For testing results
-
-//const boardPrint = structuredClone(board);
+/*
 for (let i = 0; i < board.length; i++) {
-    for (let k = 0; k < board[i].length; k++) {
-        if (board[i][k] === 1) board[i][k] = 255;
-    }
+    if (board[i] === 1) board[i] = 255;
 }
-//Note: the array is transposed
-const ndBoard = ndarray(board.flat(), [WIDTH, HEIGHT]);
+
+const ndBoard = ndarray(board, [WIDTH*(2**STAGES_AMOUNT), HEIGHT*(2**STAGES_AMOUNT)]);
 savePixels(ndBoard, "gif").pipe(process.stdout)
+*/
