@@ -85,17 +85,17 @@ function placeAdjacent(adjAmount) {
 }
 
 const board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
-const adjacenciesBoard = Array.from({length:HEIGHT}, () => new Uint8ClampedArray(WIDTH));
-let adjAmount = 0;
+//const adjacenciesBoard = Array.from({length:HEIGHT}, () => new Uint8ClampedArray(WIDTH));
+//let adjAmount = 0;
 
 //const root = randomCoords(HEIGHT, WIDTH); //Root for DLA
 const root = [Math.floor(HEIGHT/2), Math.floor(WIDTH/2)];
 board[root[0]][root[1]] = 1;
-adjAmount+=updateAdjacencies(root[0], root[1]);
-adjAmount++;
+//adjAmount+=updateAdjacencies(root[0], root[1]);
+//adjAmount++;
 
 for (let i = 1; i < HEIGHT*WIDTH*PERCENTAGE_FILLED; i++) {
-    adjAmount+=placeAdjacent(adjAmount);
+    //adjAmount+=placeAdjacent(adjAmount);
 }
 
 
