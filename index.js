@@ -103,12 +103,12 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
     const currentHeight = HEIGHT*(2**i);
     const currentWidth = WIDTH*(2**i);
     for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
-        let randomFlag = false;
+        let randomFlag = true;
         let random;
         do {
             random = randomSingle(currentHeight*currentWidth);
-            if (board[random] !== 0) {
-                randomFlag = true;
+            if (board[random] === 0) {
+                randomFlag = false;
             }
         } while (randomFlag);
         board[random] = 2;
