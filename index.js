@@ -5,7 +5,7 @@ const ndarray = require("ndarray");
 const WIDTH = 5;
 const HEIGHT = 5;
 const PERCENTAGE_FILLED = 0.4;
-const STAGES_AMOUNT = 5;
+const STAGES_AMOUNT = 1;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -95,6 +95,17 @@ function placeRoot(currentHeight, currentWidth, root) {
     return random;
 }
 
+//Only for testing
+function printBoard(board, currentWidth) {
+    for (let x = 0; x < Math.floor(board.length/currentWidth); x++) {
+        let arr = [];
+        for (let z = 0; z < currentWidth; z++) {
+            arr.push(board[x*currentWidth + z]);
+        }
+        console.log(arr);
+    }
+}
+
 //let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
 let board = new Uint8Array(HEIGHT*WIDTH);
 let blurryBoard = new Int16Array(board.length);
@@ -126,53 +137,61 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
         
         //Moving new block
         let flag = true;
-        let coordY = Math.floor(random/currentWidth);
-        let coordX = random%currentWidth;
+        //Check if adjacent to other block
         do {
-            //Check if adjacent to other block
+            let coordY = Math.floor(random/currentWidth);
+            let coordX = random%currentWidth;
             if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
                 flag = false;
+                printBoard(board, currentWidth)
+                console.log(random)
+                console.log(coordY)
+                console.log(coordX)
                 board[random] = 1;
+                printBoard(board, currentWidth)
+                console.log("---------------------")
             }
             //Choose movement direction
             let direction = randomSingle(4);
             //Move
-            switch (direction) {
-                case 0:
-                    if(coordY!==0) {
-                        board[random] = 0;
-                        random-=currentHeight;
-                        board[random] = 2;
-                    }
-                    break;
-                case 1:
-                    if (coordY!==currentHeight-1) {
-                        board[random] = 0;
-                        random+=currentHeight;
-                        board[random] = 2;
-                    }
-                    break;
-                case 2:
-                    if (coordX!==0) {
-                        board[random] = 0;
-                        random--;
-                        board[random] = 2;
-                    }
-                    break;
-                case 3:
-                    if (coordX!==currentWidth-1) {
-                        board[random] = 0;
-                        random++;
-                        board[random] = 2;
-                    }
-                    break;
-                default:
-                    break;
+            if (flag) {
+                switch (direction) {
+                    case 0:
+                        if(coordY!==0) {
+                            board[random] = 0;
+                            random-=currentHeight;
+                            board[random] = 2;
+                        }
+                        break;
+                    case 1:
+                        if (coordY!==currentHeight-1) {
+                            board[random] = 0;
+                            random+=currentHeight;
+                            board[random] = 2;
+                        }
+                        break;
+                    case 2:
+                        if (coordX!==0) {
+                            board[random] = 0;
+                            random--;
+                            board[random] = 2;
+                        }
+                        break;
+                    case 3:
+                        if (coordX!==currentWidth-1) {
+                            board[random] = 0;
+                            random++;
+                            board[random] = 2;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         } while (flag);
     }
-    console.log("Stage "+i+" done")
-    console.log(board)
+    console.log("Stage "+i+" done");
+    console.log(board);
 }
 
 
