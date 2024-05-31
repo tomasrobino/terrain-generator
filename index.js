@@ -84,10 +84,6 @@ function placeAdjacent(adjAmount) {
     
 }
 
-//let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
-let board = new Uint8Array(HEIGHT*WIDTH);
-let blurryBoard = new Int16Array(board.length);
-
 //Get root of algorithm, used in every resizing
 function placeRoot(limitH, limitV, sizeH, sizeV) {
     const newSize = [limitH*2, limitV*2];
@@ -96,6 +92,10 @@ function placeRoot(limitH, limitV, sizeH, sizeV) {
     board[limitH*randomH + randomV] = 1;
     return [randomH, randomV];
 }
+
+//let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
+let board = new Uint8Array(HEIGHT*WIDTH);
+let blurryBoard = new Int16Array(board.length);
 
 //Amount of times grid will be resized
 let root = placeRoot(HEIGHT, WIDTH, 1, 1);
@@ -118,9 +118,7 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
 }
 
 
-
-
-//For testing result
+//For testing results
 
 //const boardPrint = structuredClone(board);
 for (let i = 0; i < board.length; i++) {
