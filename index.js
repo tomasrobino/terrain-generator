@@ -107,6 +107,6 @@ for (let i = 0; i < board.length; i++) {
         if (board[i][k] === 1) board[i][k] = 255;
     }
 }
-
+//Note: the array is transposed
 const ndBoard = ndarray(board.flat(), [WIDTH, HEIGHT]);
 savePixels(ndBoard, "gif").pipe(process.stdout)
