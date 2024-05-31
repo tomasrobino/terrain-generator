@@ -121,6 +121,7 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
             //Check if adjacent to other block
             if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
                 flag = false;
+                board[random] = 1;
             }
             //Choose movement direction
             let direction = randomSingle(4);
