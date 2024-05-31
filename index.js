@@ -85,12 +85,12 @@ function placeAdjacent(adjAmount) {
 }
 
 //Get root of algorithm, used in every resizing
-function placeRoot(limitH, limitV, sizeH, sizeV) {
-    const newSize = [limitH*2, limitV*2];
+function placeRoot(limitH, limitW, sizeH, sizeW) {
+    const newSize = [limitH*2, limitW*2];
     const randomH = randomSingle(newSize[0]-sizeH+1);
-    const randomV = randomSingle(newSize[1]-sizeV+1);
-    board[limitH*randomH + randomV] = 1;
-    return [randomH, randomV];
+    const randomW = randomSingle(newSize[1]-sizeW+1);
+    board[limitW*randomH + randomW] = 1;
+    return [randomH, randomW];
 }
 
 //let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
@@ -112,6 +112,52 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
             }
         } while (randomFlag);
         board[random] = 2;
+        
+        //Moving new block
+        let flag = true;
+        let coordY = Math.floor(random/currentWidth);
+        let coordX = random%currentWidth;
+        do {
+            //Check if adjacent to other block
+            if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
+                flag = false;
+            }
+            //Choose movement direction
+            let direction = randomSingle(4);
+            //Move
+            switch (direction) {
+                case 0:
+                    if(coordY!==0) {
+                        board[random] = 0;
+                        random-=currentHeight;
+                        board[random] = 2;
+                    }
+                    break;
+                case 1:
+                    if (coordY!==currentHeight-1) {
+                        board[random] = 0;
+                        random+=currentHeight;
+                        board[random] = 2;
+                    }
+                    break;
+                case 2:
+                    if (coordX!==0) {
+                        board[random] = 0;
+                        random--;
+                        board[random] = 2;
+                    }
+                    break;
+                case 3:
+                    if (coordX!==currentWidth-1) {
+                        board[random] = 0;
+                        random++;
+                        board[random] = 2;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } while (flag);
     }
     root = placeRoot(currentHeight, currentWidth, currentHeight/2, currentWidth/2);
     board = new Uint8Array(currentHeight*currentWidth);
