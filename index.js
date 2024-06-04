@@ -1,11 +1,12 @@
 const savePixels = require("save-pixels");
 const ndarray = require("ndarray");
+const fs = require("node:fs");
 
 
-const WIDTH = 5;
-const HEIGHT = 5;
-const PERCENTAGE_FILLED = 0.4;
-const STAGES_AMOUNT = 5;
+const WIDTH = 10;
+const HEIGHT = 10;
+const PERCENTAGE_FILLED = 0.2;
+const STAGES_AMOUNT = 2;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -86,10 +87,21 @@ function placeAdjacent(adjAmount) {
 
 //Get and place root of algorithm, used in every resizing
 function placeRoot(currentHeight, currentWidth, root) {
-    const random = randomSingle(Math.floor((currentHeight*currentWidth)/2));
+    const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
+    let offset = 0;
+    //printBoard(root, currentWidth)
+    //Position of random within square of permitted spawn places
+    let coordY = Math.floor(random/(Math.floor(currentWidth/2)));
+    let coordX = random%(Math.floor(currentWidth/2));
+
+    //Real position of random
+    let position = coordY*currentWidth + coordX;
     for (let i = 0; i < root.length; i++) {
         if (root[i] === 1) {
-            board[Math.floor(random/currentWidth) + random%currentWidth + i] = 1;
+            if ((i+1)%Math.floor(currentWidth/2) === 0) {
+                offset += Math.floor(currentWidth/2);
+            }
+            board[offset+i+position] = 100;
         }
     }
     return random;
@@ -106,7 +118,6 @@ function printBoard(board, currentWidth) {
     }
 }
 
-//let board = Array.from({length:HEIGHT}, () => new Array(WIDTH).fill(0));
 let board = new Uint8Array(HEIGHT*WIDTH);
 let blurryBoard = new Int16Array(board.length);
 
@@ -119,7 +130,9 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
     if (i===0) {
         root = placeRoot(currentHeight, currentWidth, [1]);
     } else {
-        let newBoard = [...board];
+        //printBoard(board, Math.floor(currentWidth/2))
+        let newBoard = new Uint8Array(board);
+        //printBoard(newBoard, Math.floor(currentWidth/2))
         board = new Uint8Array(currentHeight*currentWidth);
         root = placeRoot(currentHeight, currentWidth, newBoard);
     }
