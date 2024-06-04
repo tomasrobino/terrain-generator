@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "save-pixels": "^2.3.6"
+  },
+  "dependencies": {
+    "sharp": "^0.33.4"
   }
 }
