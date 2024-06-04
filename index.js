@@ -205,14 +205,12 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
     }
     //console.log("Stage "+i+" done");
     //printBoard(board, currentWidth)
+    //For testing
+    const ndBoard = ndarray(board, [currentWidth, currentHeight]);
+    const writeable = fs.createWriteStream("results/stage"+(i+1)+".gif");
+    savePixels(ndBoard, "gif").pipe(writeable);
 }
 
 
 //For testing results
 //printBoard(board, WIDTH*(2**(STAGES_AMOUNT-1)))
-for (let i = 0; i < board.length; i++) {
-    if (board[i] === 1) board[i] = 255;
-}
-
-const ndBoard = ndarray(board, [WIDTH*(2**(STAGES_AMOUNT-1)), HEIGHT*(2**(STAGES_AMOUNT-1))]);
-savePixels(ndBoard, "gif").pipe(process.stdout)
