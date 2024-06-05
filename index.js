@@ -17,7 +17,6 @@ function randomSingle(max, min = 0) {
 function placeRoot(currentHeight, currentWidth, root) {
     const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
     let offset = 0;
-    //printBoard(root, currentWidth)
     //Position of random within square of permitted spawn places
     let coordY = Math.floor(random/(Math.floor(currentWidth/2)));
     let coordX = random%(Math.floor(currentWidth/2));
@@ -52,102 +51,93 @@ async function saveToFile(array, width, height, destination) {
 }
 
 async function main() {
-let board = new Uint8Array(HEIGHT*WIDTH);
-let blurryBoard = new Int16Array(board.length);
+    let board = new Uint8Array(HEIGHT*WIDTH);
+    let blurryBoard = new Int16Array(board.length);
 
-for (let i = 0; i < STAGES_AMOUNT; i++) {
-    const currentHeight = HEIGHT*(2**i);
-    const currentWidth = WIDTH*(2**i);
-    let root;
-    
-    if (i===0) {
-        root = placeRoot(currentHeight, currentWidth, [1]);
-    } else {
-        //printBoard(board, Math.floor(currentWidth/2))
-        let newBoard = new Uint8Array(board);
-        //printBoard(newBoard, Math.floor(currentWidth/2))
-        board = new Uint8Array(currentHeight*currentWidth);
-        root = placeRoot(currentHeight, currentWidth, newBoard);
-    }
-    for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
-        let randomFlag = true;
-        let random;
-        do {
-            random = randomSingle(currentHeight*currentWidth);
-            if (board[random] === 0) {
-                randomFlag = false;
-            }
-            
-        } while (randomFlag);
-        board[random] = 2;
+    for (let i = 0; i < STAGES_AMOUNT; i++) {
+        const currentHeight = HEIGHT*(2**i);
+        const currentWidth = WIDTH*(2**i);
+        let root;
         
-        //Moving new block
-        let flag = true;
-        //Check if adjacent to other block
-        do {
-            let coordY = Math.floor(random/currentWidth);
-            let coordX = random%currentWidth;
-            if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
-                flag = false;
-                //printBoard(board, currentWidth)
-                //console.log(random)
-                //console.log(coordY)
-                //console.log(coordX)
-                board[random] = 1;
-                //printBoard(board, currentWidth)
-                //console.log("---------------------")
-            }
-            //Choose movement direction
-            let direction = randomSingle(4);
-            //Move
-            if (flag) {
-                switch (direction) {
-                    case 0:
-                        if(coordY!==0) {
-                            board[random] = 0;
-                            random-=currentHeight;
-                            board[random] = 2;
-                        }
-                        break;
-                    case 1:
-                        if (coordY!==currentHeight-1) {
-                            board[random] = 0;
-                            random+=currentHeight;
-                            board[random] = 2;
-                        }
-                        break;
-                    case 2:
-                        if (coordX!==0) {
-                            board[random] = 0;
-                            random--;
-                            board[random] = 2;
-                        }
-                        break;
-                    case 3:
-                        if (coordX!==currentWidth-1) {
-                            board[random] = 0;
-                            random++;
-                            board[random] = 2;
-                        }
-                        break;
-                    default:
-                        break;
+        if (i===0) {
+            root = placeRoot(currentHeight, currentWidth, [1]);
+        } else {
+            //printBoard(board, Math.floor(currentWidth/2))
+            let newBoard = new Uint8Array(board);
+            //printBoard(newBoard, Math.floor(currentWidth/2))
+            board = new Uint8Array(currentHeight*currentWidth);
+            root = placeRoot(currentHeight, currentWidth, newBoard);
+        }
+        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
+            let randomFlag = true;
+            let random;
+            do {
+                random = randomSingle(currentHeight*currentWidth);
+                if (board[random] === 0) {
+                    randomFlag = false;
                 }
-            }
-        } while (flag);
+                
+            } while (randomFlag);
+            board[random] = 2;
+            
+            //Moving new block
+            let flag = true;
+            //Check if adjacent to other block
+            do {
+                let coordY = Math.floor(random/currentWidth);
+                let coordX = random%currentWidth;
+                if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
+                    flag = false;
+                    board[random] = 1;
+                }
+                //Choose movement direction
+                let direction = randomSingle(4);
+                //Move
+                if (flag) {
+                    switch (direction) {
+                        case 0:
+                            if(coordY!==0) {
+                                board[random] = 0;
+                                random-=currentHeight;
+                                board[random] = 2;
+                            }
+                            break;
+                        case 1:
+                            if (coordY!==currentHeight-1) {
+                                board[random] = 0;
+                                random+=currentHeight;
+                                board[random] = 2;
+                            }
+                            break;
+                        case 2:
+                            if (coordX!==0) {
+                                board[random] = 0;
+                                random--;
+                                board[random] = 2;
+                            }
+                            break;
+                        case 3:
+                            if (coordX!==currentWidth-1) {
+                                board[random] = 0;
+                                random++;
+                                board[random] = 2;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } while (flag);
+        }
+        //For testing
+        for (let i = 0; i < board.length; i++) {
+            if (board[i] === 1) board[i] = 255;
+        }
+        await saveToFile(board, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
     }
-    //console.log("Stage "+i+" done");
-    //printBoard(board, currentWidth)
-    //For testing
-    //const ndBoard = ndarray(board, [currentWidth, currentHeight]);
-    //const writeable = fs.createWriteStream("results/stage"+(i+1)+".gif");
-    //savePixels(ndBoard, "gif").pipe(writeable);
-    for (let i = 0; i < board.length; i++) {
-        if (board[i] === 1) board[i] = 255;
-    }
-    await saveToFile(board, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
 }
-}
+
 main()
+
+
 //For testing results
-//printBoard(board, WIDTH*(2**(STAGES_AMOUNT-1)))
