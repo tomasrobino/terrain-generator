@@ -1,12 +1,11 @@
-const savePixels = require("save-pixels");
-const ndarray = require("ndarray");
 const fs = require("node:fs");
+const sharp = require("sharp");
 
 
 const WIDTH = 10;
 const HEIGHT = 10;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 2;
+const STAGES_AMOUNT = 1;
 
 //Returns two random integers, bounded by max and min
 function randomCoords(heightMax, widthMax, heightMin = 0, widthMin = 0) {
@@ -206,11 +205,17 @@ for (let i = 0; i < STAGES_AMOUNT; i++) {
     //console.log("Stage "+i+" done");
     //printBoard(board, currentWidth)
     //For testing
-    const ndBoard = ndarray(board, [currentWidth, currentHeight]);
-    const writeable = fs.createWriteStream("results/stage"+(i+1)+".gif");
-    savePixels(ndBoard, "gif").pipe(writeable);
+    //const ndBoard = ndarray(board, [currentWidth, currentHeight]);
+    //const writeable = fs.createWriteStream("results/stage"+(i+1)+".gif");
+    //savePixels(ndBoard, "gif").pipe(writeable);
+    
 }
 
 
 //For testing results
 //printBoard(board, WIDTH*(2**(STAGES_AMOUNT-1)))
+for (let i = 0; i < board.length; i++) {
+    if (board[i] === 1) board[i] = 255;
+}
+let img = sharp(board, {raw: { width: WIDTH*(2**(STAGES_AMOUNT-1)), height: HEIGHT*(2**(STAGES_AMOUNT-1)), channels: 1 }});
+img.toFile("results/stage1.gif");
