@@ -50,8 +50,10 @@ async function saveToFile(array, width, height, destination) {
     await img.toFile(destination);
 }
 
+let board;
+
 async function main() {
-    let board = new Uint8Array(HEIGHT*WIDTH);
+    board = new Uint8Array(HEIGHT*WIDTH);
     let blurryBoard = new Int16Array(board.length);
 
     for (let i = 0; i < STAGES_AMOUNT; i++) {
@@ -60,7 +62,8 @@ async function main() {
         let root;
         
         if (i===0) {
-            root = placeRoot(currentHeight, currentWidth, [1]);
+            root = randomSingle(Math.floor((currentHeight*currentWidth)));
+            board[root] = 100;
         } else {
             //printBoard(board, Math.floor(currentWidth/2))
             let newBoard = new Uint8Array(board);
