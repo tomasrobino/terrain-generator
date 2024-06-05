@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const WIDTH = 20;
 const HEIGHT = 20;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 2;
+const STAGES_AMOUNT = 5;
 
 
 //Returns one random integer, bounded by max and min
@@ -14,7 +14,7 @@ function randomSingle(max, min = 0) {
 }
 
 //Get and place root of algorithm, used in every resizing
-function placeRoot(currentHeight, currentWidth, root) {
+function placeRoot(currentHeight, currentWidth, root, board) {
     const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
     let offset = 0;
     //Position of random within square of permitted spawn places
@@ -24,10 +24,10 @@ function placeRoot(currentHeight, currentWidth, root) {
     //Real position of random
     let position = coordY*currentWidth + coordX;
     for (let i = 0; i < root.length; i++) {
+        if ((i+1)%Math.floor(currentWidth/2) === 0) {
+            offset += Math.floor(currentWidth/2);
+        }
         if (root[i] !== 0) {
-            if ((i+1)%Math.floor(currentWidth/2) === 0) {
-                offset += Math.floor(currentWidth/2);
-            }
             board[offset+i+position] = 100;
         }
     }
@@ -50,10 +50,8 @@ async function saveToFile(array, width, height, destination) {
     await img.toFile(destination);
 }
 
-let board;
-
 async function main() {
-    board = new Uint8Array(HEIGHT*WIDTH);
+    let board = new Uint8Array(HEIGHT*WIDTH);
     let blurryBoard = new Int16Array(board.length);
 
     for (let i = 0; i < STAGES_AMOUNT; i++) {
@@ -65,11 +63,9 @@ async function main() {
             root = randomSingle(Math.floor((currentHeight*currentWidth)));
             board[root] = 100;
         } else {
-            //printBoard(board, Math.floor(currentWidth/2))
-            let newBoard = new Uint8Array(board);
-            //printBoard(newBoard, Math.floor(currentWidth/2))
+            let oldBoard = new Uint8Array(board);
             board = new Uint8Array(currentHeight*currentWidth);
-            root = placeRoot(currentHeight, currentWidth, newBoard);
+            root = placeRoot(currentHeight, currentWidth, oldBoard, board);
         }
         for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
             let randomFlag = true;
@@ -141,6 +137,3 @@ async function main() {
 }
 
 main()
-
-
-//For testing results
