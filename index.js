@@ -85,45 +85,55 @@ async function main() {
             do {
                 let coordY = Math.floor(random/currentWidth);
                 let coordX = random%currentWidth;
-                if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
+                if (coordY!==0 && board[random-currentWidth] !== 0) {
                     flag = false;
                     board[random] = 1;
-                }
-                //Choose movement direction
-                let direction = randomSingle(4);
-                //Move
-                if (flag) {
-                    switch (direction) {
-                        case 0:
-                            if(coordY!==0) {
-                                board[random] = 0;
-                                random-=currentHeight;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 1:
-                            if (coordY!==currentHeight-1) {
-                                board[random] = 0;
-                                random+=currentHeight;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 2:
-                            if (coordX!==0) {
-                                board[random] = 0;
-                                random--;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 3:
-                            if (coordX!==currentWidth-1) {
-                                board[random] = 0;
-                                random++;
-                                board[random] = 2;
-                            }
-                            break;
-                        default:
-                            break;
+                } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
+                    flag = false;
+                    board[random] = 1;
+                } else if (coordX!==0 && board[random-1] !== 0) {
+                    flag = false;
+                    board[random] = 1;
+                } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
+                    flag = false;
+                    board[random] = 1;
+                } else {
+                    //Choose movement direction
+                    let direction = randomSingle(4);
+                    //Move
+                    if (flag) {
+                        switch (direction) {
+                            case 0:
+                                if(coordY!==0) {
+                                    board[random] = 0;
+                                    random-=currentHeight;
+                                    board[random] = 2;
+                                }
+                                break;
+                            case 1:
+                                if (coordY!==currentHeight-1) {
+                                    board[random] = 0;
+                                    random+=currentHeight;
+                                    board[random] = 2;
+                                }
+                                break;
+                            case 2:
+                                if (coordX!==0) {
+                                    board[random] = 0;
+                                    random--;
+                                    board[random] = 2;
+                                }
+                                break;
+                            case 3:
+                                if (coordX!==currentWidth-1) {
+                                    board[random] = 0;
+                                    random++;
+                                    board[random] = 2;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             } while (flag);
