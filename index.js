@@ -85,18 +85,23 @@ async function main() {
             do {
                 let coordY = Math.floor(random/currentWidth);
                 let coordX = random%currentWidth;
+                //If there's a block above
                 if (coordY!==0 && board[random-currentWidth] !== 0) {
                     flag = false;
                     board[random] = 1;
+                //If there's a block below
                 } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
                     flag = false;
                     board[random] = 1;
+                //If there's a block on the right
                 } else if (coordX!==0 && board[random-1] !== 0) {
                     flag = false;
                     board[random] = 1;
+                //If there's a block on the left
                 } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
                     flag = false;
                     board[random] = 1;
+                //If there's no adjacent block, move randomly
                 } else {
                     //Choose movement direction
                     let direction = randomSingle(4);
