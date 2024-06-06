@@ -77,7 +77,6 @@ async function main() {
                 }
                 
             } while (randomFlag);
-            board[random] = 2;
             
             //Moving new block
             let flag = true;
@@ -110,30 +109,22 @@ async function main() {
                         switch (direction) {
                             case 0:
                                 if(coordY!==0) {
-                                    board[random] = 0;
                                     random-=currentHeight;
-                                    board[random] = 2;
                                 }
                                 break;
                             case 1:
                                 if (coordY!==currentHeight-1) {
-                                    board[random] = 0;
                                     random+=currentHeight;
-                                    board[random] = 2;
                                 }
                                 break;
                             case 2:
                                 if (coordX!==0) {
-                                    board[random] = 0;
                                     random--;
-                                    board[random] = 2;
                                 }
                                 break;
                             case 3:
                                 if (coordX!==currentWidth-1) {
-                                    board[random] = 0;
                                     random++;
-                                    board[random] = 2;
                                 }
                                 break;
                             default:
