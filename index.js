@@ -1,4 +1,3 @@
-const fs = require("node:fs");
 const sharp = require("sharp");
 
 
@@ -14,37 +13,7 @@ function randomSingle(max, min = 0) {
 }
 
 //Get and place root of algorithm, used in every resizing
-function placeRoot(currentHeight, currentWidth, root, board) {    
-    let offset = 0;
-    let oldWidth = Math.floor(currentWidth/2);
-    let blockCounter = 0;
-    for (let i = 0; i < root.length; i++) {
-        if (root[i] !== 0) {
-            board[(2*i)+offset] = root[i];
-            switch (root[i]) {
-                case 2:
-                    board[(2*i)+offset-currentWidth] = 2;
-                    break;
-                case 3:
-                    board[(2*i)+offset+1] = 3;
-                    break;
-                case 4:
-                    board[(2*i)+offset+currentWidth] = 4;
-                    break;
-                case 5:
-                    board[(2*i)+offset-1] = 5;
-                    break;
-                default:
-                    break;
-            }
-            blockCounter+=2;
-        }
-        if ((i+1)%oldWidth === 0) {
-            offset += currentWidth;
-        }
-    }
-    return blockCounter;
-}
+
 
 //Only for testing
 function printBoard(board, currentWidth) {
@@ -57,35 +26,68 @@ function printBoard(board, currentWidth) {
     }
 }
 
-async function saveToFile(array, width, height, destination) {
-    let img = sharp(array, {raw: { width: width, height: height, channels: 1 }});
-    await img.toFile(destination);
-}
+class Board {
+    static blockCounter = 0;
 
-async function main() {
-    let board = new Uint8Array(HEIGHT*WIDTH);
-    let blurryBoard = new Int16Array(board.length);
+    static getBlockCounter() {
+        return this.blockCounter;
+    }
 
-    for (let i = 0; i < STAGES_AMOUNT; i++) {
-        const currentHeight = HEIGHT*(2**i);
-        const currentWidth = WIDTH*(2**i);
-        let root;
-        let blockCounter = 1;
-        if (i===0) {
-            root = randomSingle(Math.floor((currentHeight*currentWidth)));
-            board[root] = 1;
-            blockCounter++;
+    static setBlockCounter(value) {
+        this.blockCounter+=value;
+    }
+
+    static addBlockCounter() {
+        this.blockCounter++;
+    }
+
+    constructor(height, width, root, rootElevation, rootHeight, rootWidth) {
+        this.height = height;
+        this.width = width;
+        this.root = new Uint8Array(root);
+        this.rootElevation = new Uint16Array(rootElevation);
+        this.rootHeight = rootHeight;
+        this.rootWidth = rootWidth;
+        this.board = new Uint8Array(height*width);
+        let offset = 0;
+        if (root.length===1) {
+            this.board[randomSingle(Math.floor((this.height*this.width)))] = 1;
+            Board.addBlockCounter();
         } else {
-            let oldBoard = new Uint8Array(board);
-            board = new Uint8Array(currentHeight*currentWidth);
-            blockCounter += placeRoot(currentHeight, currentWidth, oldBoard, board);
+            for (let i = 0; i < root.length; i++) {
+                if (root[i] !== 0) {
+                    this.board[(2*i)+offset] = root[i];
+                    switch (root[i]) {
+                        case 2:
+                            this.board[(2*i)+offset-this.width] = 2;
+                            break;
+                        case 3:
+                            this.board[(2*i)+offset+1] = 3;
+                            break;
+                        case 4:
+                            this.board[(2*i)+offset+this.width] = 4;
+                            break;
+                        case 5:
+                            this.board[(2*i)+offset-1] = 5;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if ((i+1)%this.rootWidth === 0) {
+                    offset += this.width;
+                }
+            }
         }
-        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED - blockCounter; k++) {
+    }
+
+    populate() {
+        for (let k = 0; k < this.height*this.width*PERCENTAGE_FILLED - Board.getBlockCounter(); k++) {
             let randomFlag = true;
             let random;
             do {
-                random = randomSingle(currentHeight*currentWidth);
-                if (board[random] === 0) {
+                random = randomSingle(this.height*this.width);
+                if (this.board[random] === 0) {
                     randomFlag = false;
                 }
                 
@@ -95,27 +97,27 @@ async function main() {
             let flag = true;
             //Check if adjacent to other block
             do {
-                let coordY = Math.floor(random/currentWidth);
-                let coordX = random%currentWidth;
+                let coordY = Math.floor(random/this.width);
+                let coordX = random%this.width;
                 //If there's a block above
-                if (coordY!==0 && board[random-currentWidth] !== 0) {
-                    board[random] = 2;
-                    blockCounter++;
+                if (coordY!==0 && this.board[random-this.width] !== 0) {
+                    this.board[random] = 2;
+                    Board.addBlockCounter();
                     flag = false;
                 //If there's a block below
-                } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
-                    board[random] = 4;
-                    blockCounter++;
+                } else if (coordY!==this.height-1 && this.board[random+this.width] !== 0) {
+                    this.board[random] = 4;
+                    Board.addBlockCounter();
                     flag = false;
                 //If there's a block on the right
-                } else if (coordX!==0 && board[random-1] !== 0) {
-                    board[random] = 5;
-                    blockCounter++;
+                } else if (coordX!==0 && this.board[random-1] !== 0) {
+                    this.board[random] = 5;
+                    Board.addBlockCounter();
                     flag = false;
                 //If there's a block on the left
-                } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
-                    board[random] = 3;
-                    blockCounter++;
+                } else if (coordX!==this.width-1 && this.board[random+1] !== 0) {
+                    this.board[random] = 3;
+                    Board.addBlockCounter();
                     flag = false;
                 //If there's no adjacent block, move randomly
                 } else {
@@ -126,12 +128,12 @@ async function main() {
                         switch (direction) {
                             case 0:
                                 if(coordY!==0) {
-                                    random-=currentHeight;
+                                    random-=this.height;
                                 }
                                 break;
                             case 1:
-                                if (coordY!==currentHeight-1) {
-                                    random+=currentHeight;
+                                if (coordY!==this.height-1) {
+                                    random+=this.height;
                                 }
                                 break;
                             case 2:
@@ -140,7 +142,7 @@ async function main() {
                                 }
                                 break;
                             case 3:
-                                if (coordX!==currentWidth-1) {
+                                if (coordX!==this.width-1) {
                                     random++;
                                 }
                                 break;
@@ -151,16 +153,26 @@ async function main() {
                 }
             } while (flag);
         }
-        console.log(`Stage ${i+1} done; Placed ${blockCounter-1} blocks`);
-        //For testing
-        let boardForImage = new Uint8Array(board);
+    }
+
+    saveToFile(destination) {
+        let boardForImage = new Uint8Array(this.board);
         for (let g = 0; g < boardForImage.length; g++) {
             if (boardForImage[g] === 1) {
                 boardForImage[g] = 100;
             } else if (boardForImage[g] !== 0) boardForImage[g] = 255;
         }
-        await saveToFile(boardForImage, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
+        let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
+        img.toFile(destination);
     }
 }
 
-main()
+let boardArray = [];
+boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
+boardArray[0].populate();
+boardArray[0].saveToFile("results/stage1.gif");
+for (let i = 1; i < STAGES_AMOUNT; i++) {
+    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
+    boardArray[i].populate();
+    boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
+}
