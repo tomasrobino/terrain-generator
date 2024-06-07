@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const WIDTH = 20;
 const HEIGHT = 20;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 2;
+const STAGES_AMOUNT = 5;
 
 
 //Returns one random integer, bounded by max and min
@@ -80,7 +80,7 @@ async function main() {
             board = new Uint8Array(currentHeight*currentWidth);
             blockCounter += placeRoot(currentHeight, currentWidth, oldBoard, board);
         }
-        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
+        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED - blockCounter; k++) {
             let randomFlag = true;
             let random;
             do {
