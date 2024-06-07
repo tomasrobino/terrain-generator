@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const WIDTH = 20;
 const HEIGHT = 20;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 5;
+const STAGES_AMOUNT = 1;
 
 
 //Returns one random integer, bounded by max and min
@@ -20,7 +20,7 @@ function placeRoot(currentHeight, currentWidth, root, board) {
     //Position of random within square of permitted spawn places
     let coordY = Math.floor(random/(Math.floor(currentWidth/2)));
     let coordX = random%(Math.floor(currentWidth/2));
-
+    let blockCounter = 0;
     //Real position of random
     let position = coordY*currentWidth + coordX;
     for (let i = 0; i < root.length; i++) {
@@ -29,9 +29,10 @@ function placeRoot(currentHeight, currentWidth, root, board) {
         }
         if (root[i] !== 0) {
             board[offset+i+position] = 100;
+            blockCounter++;
         }
     }
-    return random;
+    return blockCounter;
 }
 
 //Only for testing
@@ -51,21 +52,22 @@ async function saveToFile(array, width, height, destination) {
 }
 
 async function main() {
-    let board = new Uint8Array(HEIGHT*WIDTH);
+    let board = new Uint32Array(HEIGHT*WIDTH);
     let blurryBoard = new Int16Array(board.length);
 
     for (let i = 0; i < STAGES_AMOUNT; i++) {
         const currentHeight = HEIGHT*(2**i);
         const currentWidth = WIDTH*(2**i);
         let root;
-        
+        let blockCounter = 1;
         if (i===0) {
             root = randomSingle(Math.floor((currentHeight*currentWidth)));
-            board[root] = 100;
+            board[root] = blockCounter;
+            blockCounter++;
         } else {
             let oldBoard = new Uint8Array(board);
             board = new Uint8Array(currentHeight*currentWidth);
-            root = placeRoot(currentHeight, currentWidth, oldBoard, board);
+            blockCounter += placeRoot(currentHeight, currentWidth, oldBoard, board);
         }
         for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
             let randomFlag = true;
@@ -86,20 +88,24 @@ async function main() {
                 let coordX = random%currentWidth;
                 //If there's a block above
                 if (coordY!==0 && board[random-currentWidth] !== 0) {
+                    board[random] = blockCounter;
+                    blockCounter++;
                     flag = false;
-                    board[random] = 1;
                 //If there's a block below
                 } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
+                    board[random] = blockCounter;
+                    blockCounter++;
                     flag = false;
-                    board[random] = 1;
                 //If there's a block on the right
                 } else if (coordX!==0 && board[random-1] !== 0) {
+                    board[random] = blockCounter;
+                    blockCounter++;
                     flag = false;
-                    board[random] = 1;
                 //If there's a block on the left
                 } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
+                    board[random] = blockCounter;
+                    blockCounter++;
                     flag = false;
-                    board[random] = 1;
                 //If there's no adjacent block, move randomly
                 } else {
                     //Choose movement direction
@@ -134,11 +140,15 @@ async function main() {
                 }
             } while (flag);
         }
+        console.log(`Stage ${i+1} done; Placed ${blockCounter-1} blocks`);
         //For testing
-        for (let i = 0; i < board.length; i++) {
-            if (board[i] === 1) board[i] = 255;
+        let boardForImage = new Uint8Array(board);
+        for (let g = 0; g < boardForImage.length; g++) {
+            if (boardForImage[g] === 1) {
+                boardForImage[g] = 100;
+            } else if (boardForImage[g] !== 0) boardForImage[g] = 255;
         }
-        await saveToFile(board, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
+        await saveToFile(boardForImage, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
     }
 }
 
