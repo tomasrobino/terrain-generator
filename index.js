@@ -45,13 +45,14 @@ function placeRoot(currentHeight, currentWidth, root, board) {
     //Real position of random
     let position = centerCoord*currentWidth + centerCoord;
     for (let i = 0; i < root.length; i++) {
-        if ((i+1)%oldWidth === 0) {
-            offset += oldWidth;
-        }
+        
         if (root[i] !== 0) {
             console.log(`offset=${offset} i=${i} position=${position} total=${offset+i+position}`)
             board[offset+i+position] = 1;
             blockCounter++;
+        }
+        if ((i+1)%oldWidth === 0) {
+            offset += oldWidth;
         }
     }
     printBoard(board, currentWidth)
