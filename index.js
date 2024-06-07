@@ -14,24 +14,36 @@ function randomSingle(max, min = 0) {
 }
 
 //Get and place root of algorithm, used in every resizing
-function placeRoot(currentHeight, currentWidth, root, board) {
-    const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
+function placeRoot(currentHeight, currentWidth, root, board) {    
     let offset = 0;
-    //Position of random within square of permitted spawn places
-    let coordY = Math.floor(random/(Math.floor(currentWidth/2)));
-    let coordX = random%(Math.floor(currentWidth/2));
-
-    //Real position of random
-    let position = coordY*currentWidth + coordX;
+    let oldWidth = Math.floor(currentWidth/2);
+    let blockCounter = 0;
     for (let i = 0; i < root.length; i++) {
-        if ((i+1)%Math.floor(currentWidth/2) === 0) {
-            offset += Math.floor(currentWidth/2);
-        }
         if (root[i] !== 0) {
-            board[offset+i+position] = 100;
+            board[(2*i)+offset] = root[i];
+            switch (root[i]) {
+                case 2:
+                    board[(2*i)+offset-currentWidth] = 2;
+                    break;
+                case 3:
+                    board[(2*i)+offset+1] = 3;
+                    break;
+                case 4:
+                    board[(2*i)+offset+currentWidth] = 4;
+                    break;
+                case 5:
+                    board[(2*i)+offset-1] = 5;
+                    break;
+                default:
+                    break;
+            }
+            blockCounter+=2;
+        }
+        if ((i+1)%oldWidth === 0) {
+            offset += currentWidth;
         }
     }
-    return random;
+    return blockCounter;
 }
 
 //Only for testing
@@ -58,16 +70,17 @@ async function main() {
         const currentHeight = HEIGHT*(2**i);
         const currentWidth = WIDTH*(2**i);
         let root;
-        
+        let blockCounter = 1;
         if (i===0) {
             root = randomSingle(Math.floor((currentHeight*currentWidth)));
-            board[root] = 100;
+            board[root] = 1;
+            blockCounter++;
         } else {
             let oldBoard = new Uint8Array(board);
             board = new Uint8Array(currentHeight*currentWidth);
-            root = placeRoot(currentHeight, currentWidth, oldBoard, board);
+            blockCounter += placeRoot(currentHeight, currentWidth, oldBoard, board);
         }
-        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED; k++) {
+        for (let k = 0; k < currentHeight*currentWidth*PERCENTAGE_FILLED - blockCounter; k++) {
             let randomFlag = true;
             let random;
             do {
@@ -77,7 +90,6 @@ async function main() {
                 }
                 
             } while (randomFlag);
-            board[random] = 2;
             
             //Moving new block
             let flag = true;
@@ -85,54 +97,69 @@ async function main() {
             do {
                 let coordY = Math.floor(random/currentWidth);
                 let coordX = random%currentWidth;
-                if ((coordY!==0 && board[random-currentWidth] !== 0) || (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) || (coordX!==0 && board[random-1] !== 0) || (coordX!==currentWidth-1 && board[random+1] !== 0)) {
+                //If there's a block above
+                if (coordY!==0 && board[random-currentWidth] !== 0) {
+                    board[random] = 2;
+                    blockCounter++;
                     flag = false;
-                    board[random] = 1;
-                }
-                //Choose movement direction
-                let direction = randomSingle(4);
-                //Move
-                if (flag) {
-                    switch (direction) {
-                        case 0:
-                            if(coordY!==0) {
-                                board[random] = 0;
-                                random-=currentHeight;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 1:
-                            if (coordY!==currentHeight-1) {
-                                board[random] = 0;
-                                random+=currentHeight;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 2:
-                            if (coordX!==0) {
-                                board[random] = 0;
-                                random--;
-                                board[random] = 2;
-                            }
-                            break;
-                        case 3:
-                            if (coordX!==currentWidth-1) {
-                                board[random] = 0;
-                                random++;
-                                board[random] = 2;
-                            }
-                            break;
-                        default:
-                            break;
+                //If there's a block below
+                } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
+                    board[random] = 4;
+                    blockCounter++;
+                    flag = false;
+                //If there's a block on the right
+                } else if (coordX!==0 && board[random-1] !== 0) {
+                    board[random] = 5;
+                    blockCounter++;
+                    flag = false;
+                //If there's a block on the left
+                } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
+                    board[random] = 3;
+                    blockCounter++;
+                    flag = false;
+                //If there's no adjacent block, move randomly
+                } else {
+                    //Choose movement direction
+                    let direction = randomSingle(4);
+                    //Move
+                    if (flag) {
+                        switch (direction) {
+                            case 0:
+                                if(coordY!==0) {
+                                    random-=currentHeight;
+                                }
+                                break;
+                            case 1:
+                                if (coordY!==currentHeight-1) {
+                                    random+=currentHeight;
+                                }
+                                break;
+                            case 2:
+                                if (coordX!==0) {
+                                    random--;
+                                }
+                                break;
+                            case 3:
+                                if (coordX!==currentWidth-1) {
+                                    random++;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             } while (flag);
         }
+        console.log(`Stage ${i+1} done; Placed ${blockCounter-1} blocks`);
         //For testing
-        for (let i = 0; i < board.length; i++) {
-            if (board[i] === 1) board[i] = 255;
+        let boardForImage = new Uint8Array(board);
+        for (let g = 0; g < boardForImage.length; g++) {
+            if (boardForImage[g] === 1) {
+                boardForImage[g] = 100;
+            } else if (boardForImage[g] !== 0) boardForImage[g] = 255;
         }
-        await saveToFile(board, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
+        await saveToFile(boardForImage, currentWidth, currentHeight, "results/stage"+(i+1)+".gif")
     }
 }
 
