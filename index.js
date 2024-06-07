@@ -2,10 +2,10 @@ const fs = require("node:fs");
 const sharp = require("sharp");
 
 
-const WIDTH = 4;
-const HEIGHT = 4;
+const WIDTH = 20;
+const HEIGHT = 20;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 5;
+const STAGES_AMOUNT = 2;
 
 
 //Returns one random integer, bounded by max and min
@@ -17,17 +17,30 @@ function randomSingle(max, min = 0) {
 function placeRoot(currentHeight, currentWidth, root, board) {    
     let offset = 0;
     let oldWidth = Math.floor(currentWidth/2);
-    let centerCoord = Math.floor(oldWidth/2);
     let blockCounter = 0;
-    //Position in which to start copying root
-    let position = centerCoord*currentWidth + centerCoord;
     for (let i = 0; i < root.length; i++) {
         if (root[i] !== 0) {
-            board[offset+i+position] = 1;
-            blockCounter++;
+            board[(2*i)+offset] = root[i];
+            switch (root[i]) {
+                case 2:
+                    board[(2*i)+offset-currentWidth] = 2;
+                    break;
+                case 3:
+                    board[(2*i)+offset+1] = 3;
+                    break;
+                case 4:
+                    board[(2*i)+offset+currentWidth] = 4;
+                    break;
+                case 5:
+                    board[(2*i)+offset-1] = 5;
+                    break;
+                default:
+                    break;
+            }
+            blockCounter+=2;
         }
         if ((i+1)%oldWidth === 0) {
-            offset += oldWidth;
+            offset += currentWidth;
         }
     }
     return blockCounter;
