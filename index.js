@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const WIDTH = 20;
 const HEIGHT = 20;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 1;
+const STAGES_AMOUNT = 3;
 
 
 //Returns one random integer, bounded by max and min
@@ -28,7 +28,7 @@ function placeRoot(currentHeight, currentWidth, root, board) {
             offset += Math.floor(currentWidth/2);
         }
         if (root[i] !== 0) {
-            board[offset+i+position] = 100;
+            board[offset+i+position] = root[i];
             blockCounter++;
         }
     }
@@ -52,7 +52,7 @@ async function saveToFile(array, width, height, destination) {
 }
 
 async function main() {
-    let board = new Uint32Array(HEIGHT*WIDTH);
+    let board = new Uint8Array(HEIGHT*WIDTH);
     let blurryBoard = new Int16Array(board.length);
 
     for (let i = 0; i < STAGES_AMOUNT; i++) {
@@ -62,7 +62,7 @@ async function main() {
         let blockCounter = 1;
         if (i===0) {
             root = randomSingle(Math.floor((currentHeight*currentWidth)));
-            board[root] = blockCounter;
+            board[root] = 1;
             blockCounter++;
         } else {
             let oldBoard = new Uint8Array(board);
@@ -88,22 +88,22 @@ async function main() {
                 let coordX = random%currentWidth;
                 //If there's a block above
                 if (coordY!==0 && board[random-currentWidth] !== 0) {
-                    board[random] = blockCounter;
+                    board[random] = 2;
                     blockCounter++;
                     flag = false;
                 //If there's a block below
                 } else if (coordY!==currentHeight-1 && board[random+currentWidth] !== 0) {
-                    board[random] = blockCounter;
+                    board[random] = 4;
                     blockCounter++;
                     flag = false;
                 //If there's a block on the right
                 } else if (coordX!==0 && board[random-1] !== 0) {
-                    board[random] = blockCounter;
+                    board[random] = 5;
                     blockCounter++;
                     flag = false;
                 //If there's a block on the left
                 } else if (coordX!==currentWidth-1 && board[random+1] !== 0) {
-                    board[random] = blockCounter;
+                    board[random] = 3;
                     blockCounter++;
                     flag = false;
                 //If there's no adjacent block, move randomly
