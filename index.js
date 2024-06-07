@@ -1,10 +1,10 @@
 const sharp = require("sharp");
 
 
-const WIDTH = 20;
-const HEIGHT = 20;
-const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 5;
+const WIDTH = parseInt(process.argv[2]);
+const HEIGHT = parseInt(process.argv[3]);
+const PERCENTAGE_FILLED = parseFloat(process.argv[4]);
+const STAGES_AMOUNT = parseInt(process.argv[5]);
 
 
 //Returns one random integer, bounded by max and min
@@ -166,7 +166,6 @@ class Board {
         img.toFile(destination);
     }
 }
-
 let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
 boardArray[0].populate();
