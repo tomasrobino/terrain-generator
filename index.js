@@ -2,10 +2,10 @@ const fs = require("node:fs");
 const sharp = require("sharp");
 
 
-const WIDTH = 20;
-const HEIGHT = 20;
+const WIDTH = 4;
+const HEIGHT = 4;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 3;
+const STAGES_AMOUNT = 2;
 
 
 //Returns one random integer, bounded by max and min
@@ -15,6 +15,7 @@ function randomSingle(max, min = 0) {
 
 //Get and place root of algorithm, used in every resizing
 function placeRoot(currentHeight, currentWidth, root, board) {
+    /*
     const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
     let offset = 0;
     //Position of random within square of permitted spawn places
@@ -32,6 +33,28 @@ function placeRoot(currentHeight, currentWidth, root, board) {
             blockCounter++;
         }
     }
+    return blockCounter;
+    */
+    
+    let offset = 0;
+    //Position of random within square of permitted spawn places
+    let oldWidth = Math.floor(currentWidth/2);
+    printBoard(root, oldWidth);
+    let centerCoord = Math.floor(oldWidth/2);
+    let blockCounter = 0;
+    //Real position of random
+    let position = centerCoord*currentWidth + centerCoord;
+    for (let i = 0; i < root.length; i++) {
+        if ((i+1)%oldWidth === 0) {
+            offset += oldWidth;
+        }
+        if (root[i] !== 0) {
+            console.log(`offset=${offset} i=${i} position=${position} total=${offset+i+position}`)
+            board[offset+i+position] = 1;
+            blockCounter++;
+        }
+    }
+    printBoard(board, currentWidth)
     return blockCounter;
 }
 
