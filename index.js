@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const WIDTH = 4;
 const HEIGHT = 4;
 const PERCENTAGE_FILLED = 0.2;
-const STAGES_AMOUNT = 2;
+const STAGES_AMOUNT = 5;
 
 
 //Returns one random integer, bounded by max and min
@@ -14,40 +14,15 @@ function randomSingle(max, min = 0) {
 }
 
 //Get and place root of algorithm, used in every resizing
-function placeRoot(currentHeight, currentWidth, root, board) {
-    /*
-    const random = randomSingle(Math.floor((currentHeight*currentWidth)/4));
+function placeRoot(currentHeight, currentWidth, root, board) {    
     let offset = 0;
-    //Position of random within square of permitted spawn places
-    let coordY = Math.floor(random/(Math.floor(currentWidth/2)));
-    let coordX = random%(Math.floor(currentWidth/2));
-    let blockCounter = 0;
-    //Real position of random
-    let position = coordY*currentWidth + coordX;
-    for (let i = 0; i < root.length; i++) {
-        if ((i+1)%Math.floor(currentWidth/2) === 0) {
-            offset += Math.floor(currentWidth/2);
-        }
-        if (root[i] !== 0) {
-            board[offset+i+position] = root[i];
-            blockCounter++;
-        }
-    }
-    return blockCounter;
-    */
-    
-    let offset = 0;
-    //Position of random within square of permitted spawn places
     let oldWidth = Math.floor(currentWidth/2);
-    printBoard(root, oldWidth);
     let centerCoord = Math.floor(oldWidth/2);
     let blockCounter = 0;
-    //Real position of random
+    //Position in which to start copying root
     let position = centerCoord*currentWidth + centerCoord;
     for (let i = 0; i < root.length; i++) {
-        
         if (root[i] !== 0) {
-            console.log(`offset=${offset} i=${i} position=${position} total=${offset+i+position}`)
             board[offset+i+position] = 1;
             blockCounter++;
         }
@@ -55,7 +30,6 @@ function placeRoot(currentHeight, currentWidth, root, board) {
             offset += oldWidth;
         }
     }
-    printBoard(board, currentWidth)
     return blockCounter;
 }
 
