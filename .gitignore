@@ -131,3 +131,5 @@ dist
 
 
 /results
+/.vscode
+/test.txt

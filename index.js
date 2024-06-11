@@ -46,6 +46,7 @@ class Board {
         this.rootHeight = rootHeight;
         this.rootWidth = rootWidth;
         this.board = new Uint8Array(height*width);
+        
         let offset = 0;
         if (root.length===1) {
             this.board[randomSingle(Math.floor((this.height*this.width)))] = 1;
@@ -76,9 +77,62 @@ class Board {
                 }
             }
         }
+
+        this.elevation = this._populate();
     }
 
-    populate() {
+    _calcElevation(array, arrayWidth, arrayHeight) {
+        let elevation = new Uint16Array(array.length);
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] > 1 && elevation[i] === 0) {
+                let coordY = Math.floor(i/arrayWidth);
+                let coordX = i%arrayWidth;
+                let toCheck;
+                let end = true;
+                switch (array[i]) {
+                    case 2:
+                        toCheck = new Uint8Array([3,4,5]);
+                        break;
+                    case 3:
+                        toCheck = new Uint8Array([2,4,5]);
+                        break;
+                    case 4:
+                        toCheck = new Uint8Array([2,3,5]);
+                        break;
+                    case 5:
+                        toCheck = new Uint8Array([2,3,4]);
+                        break;
+                    default:
+                        break;
+                }
+                
+                //If there's a block above
+                if (toCheck.includes(2) && coordY!==0 && array[i-arrayWidth] !== 0) {
+                    end = false;
+                }
+                //If there's a block below
+                if (toCheck.includes(4) && end && coordY!==arrayHeight-1 && array[i+arrayWidth] !== 0) {
+                    end = false;
+                }
+                //If there's a block on the right
+                if (toCheck.includes(5) && end && coordX!==0 && array[i-1] !== 0) {
+                    end = false;
+                }
+                //If there's a block on the left
+                if (toCheck.includes(3) && end && coordX!==arrayWidth-1 && array[i+1] !== 0) {
+                    end = false;
+                }
+
+                if (end) {
+                    elevation[i] = 255;
+                }
+            }
+        }
+
+        return elevation;
+    }
+
+    _populate() {
         for (let k = 0; k < this.height*this.width*PERCENTAGE_FILLED - Board.getBlockCounter(); k++) {
             let randomFlag = true;
             let random;
@@ -150,6 +204,8 @@ class Board {
                 }
             } while (flag);
         }
+
+        return this._calcElevation(this.board, this.width, this.height);
     }
 
     saveToFile(destination) {
@@ -167,11 +223,9 @@ class Board {
 
 let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
-boardArray[0].populate();
 boardArray[0].saveToFile("results/stage1.gif");
 
 for (let i = 1; i < STAGES_AMOUNT; i++) {
     boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
-    boardArray[i].populate();
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
