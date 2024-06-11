@@ -83,6 +83,8 @@ class Board {
 
     _calcElevation(array, arrayWidth, arrayHeight) {
         let elevation = new Uint16Array(array.length);
+        let endsArray = [];
+        //Finding the ends and filling endsArray
         for (let i = 0; i < array.length; i++) {
             if (array[i] > 1 && elevation[i] === 0) {
                 let coordY = Math.floor(i/arrayWidth);
@@ -124,11 +126,11 @@ class Board {
                 }
 
                 if (end) {
-                    elevation[i] = 255;
+                    elevation[i] = 1;
+                    endsArray.push(i);
                 }
             }
         }
-
         return elevation;
     }
 
