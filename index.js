@@ -89,48 +89,29 @@ class Board {
             if (array[i] > 1 && elevation[i] === 0) {
                 let coordY = Math.floor(i/arrayWidth);
                 let coordX = i%arrayWidth;
-                let toCheck;
-                let end = true;
-                switch (array[i]) {
-                    case 2:
-                        toCheck = new Uint8Array([3,4,5]);
-                        break;
-                    case 3:
-                        toCheck = new Uint8Array([2,4,5]);
-                        break;
-                    case 4:
-                        toCheck = new Uint8Array([2,3,5]);
-                        break;
-                    case 5:
-                        toCheck = new Uint8Array([2,3,4]);
-                        break;
-                    default:
-                        break;
-                }
+                let adjCounter = 0;
                 
                 //If there's a block above
-                if (toCheck.includes(2) && coordY!==0 && array[i-arrayWidth] !== 0) {
-                    end = false;
-                }
+                if (coordY!==0 && array[i-arrayWidth] === 4) {
+                    adjCounter++;
                 //If there's a block below
-                if (toCheck.includes(4) && end && coordY!==arrayHeight-1 && array[i+arrayWidth] !== 0) {
-                    end = false;
-                }
+                } else if (coordY!==arrayHeight-1 && array[i+arrayWidth] === 2) {
+                    adjCounter++;
                 //If there's a block on the right
-                if (toCheck.includes(5) && end && coordX!==0 && array[i-1] !== 0) {
-                    end = false;
-                }
+                } else if (coordX!==0 && array[i-1] === 3) {
+                    adjCounter++;
                 //If there's a block on the left
-                if (toCheck.includes(3) && end && coordX!==arrayWidth-1 && array[i+1] !== 0) {
-                    end = false;
+                } else if (coordX!==arrayWidth-1 && array[i+1] === 5) {
+                    adjCounter++;
                 }
-
-                if (end) {
+                
+                if (adjCounter === 1) {
                     elevation[i] = 1;
                     endsArray.push(i);
                 }
             }
         }
+
         return elevation;
     }
 
