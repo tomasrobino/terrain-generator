@@ -118,7 +118,7 @@ class Board {
         //Advance backwards from end until finding a fork
         let forkArray = [];
         for (let i = 0; i < targetsArray.length; i++) {
-            let heightCounter = 1;
+            let pathLength = 1;
             let target = targetsArray[i];
             let noFork = true;
             while (noFork) {
@@ -149,12 +149,18 @@ class Board {
                         }
                         sideFlag++;
                     }
-                    heightCounter++;
-                    elevation[target] = heightCounter;
+                    pathLength++;
+                    elevation[target] = pathLength;
                 } else {
                     //Fork found
                     noFork = false;
-                    forkArray.push(target)
+                    //New fork
+                    if (forkArray.findIndex(val => val[0] === target) === -1) {
+                        forkArray.push([target, pathLength]);
+                    } else {
+                    //Old fork, solve it
+                        
+                    }
                 }
             }
         }
