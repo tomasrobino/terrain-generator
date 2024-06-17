@@ -81,7 +81,7 @@ class Board {
         this.elevation = this._populate();
     }
 
-    _getAdjacent(array, arrayWidth, arrayHeight) {
+    _getAdjacent(i, array, arrayWidth, arrayHeight) {
         let coordY = Math.floor(i/arrayWidth);
         let coordX = i%arrayWidth;
         let answerArray = [];
@@ -108,7 +108,7 @@ class Board {
         //Finding the ends and filling targetsArray
         for (let i = 0; i < array.length; i++) {
             if (array[i] !== 0 && elevation[i] === 0) {
-                if (this._getAdjacent(array, arrayWidth, arrayHeight).length === 1) {
+                if (this._getAdjacent(i, array, arrayWidth, arrayHeight).length === 1) {
                     elevation[i] = 1;
                     targetsArray.push(i);
                 }
@@ -116,40 +116,47 @@ class Board {
         }
 
         //Advance backwards from end until finding a fork
+        let forkArray = [];
         for (let i = 0; i < targetsArray.length; i++) {
             let heightCounter = 1;
             let target = targetsArray[i];
-            let adjs = this._getAdjacent(array, arrayWidth, arrayHeight);
-            let sideFlag = 0;
-            if (adjs.length < 3) {
-                while (sideFlag < 2) {
-                    let aux = 0;
-                    switch (adjs[sideFlag]) {
-                        case 2:
-                            aux = target-arrayWidth;
-                            break;
-                        case 3:
-                            aux = target+1;
-                            break;
-                        case 4:
-                            aux = target+arrayWidth;
-                            break;
-                        case 5:
-                            aux = target-1;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (elevation[aux] === 0) {
-                        target = aux
+            let noFork = true;
+            while (noFork) {
+                let adjs = this._getAdjacent(target, array, arrayWidth, arrayHeight);
+                let sideFlag = 0;
+                if (adjs.length < 3) {
+                    while (sideFlag < 2) {
+                        let aux = 0;
+                        switch (adjs[sideFlag]) {
+                            case 2:
+                                aux = target-arrayWidth;
+                                break;
+                            case 3:
+                                aux = target+1;
+                                break;
+                            case 4:
+                                aux = target+arrayWidth;
+                                break;
+                            case 5:
+                                aux = target-1;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (elevation[aux] === 0) {
+                            target = aux
+                            sideFlag++;
+                        }
                         sideFlag++;
                     }
-                    sideFlag++;
+                    heightCounter++;
+                    elevation[target] = heightCounter;
+                } else {
+                    //Fork found
+                    noFork = false;
+                    forkArray.push(target)
                 }
-            } else {
-                //Fork found
             }
-           
         }
 
         return elevation;
