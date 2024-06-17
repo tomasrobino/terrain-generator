@@ -152,12 +152,11 @@ class Board {
                     pathLength++;
                     elevation[target] = pathLength;
                 } else {
-                    //Fork found
-                    noFork = false;
                     //New fork
                     let forkIndex = forkArray.findIndex(val => val[0] === target);
                     if (forkIndex === -1) {
                         forkArray.push([target, pathLength]);
+                        noFork = false;
                     } else {
                         //Old fork, solve it
                         let maxElevation;
