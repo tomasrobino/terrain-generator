@@ -155,11 +155,16 @@ class Board {
                     //Fork found
                     noFork = false;
                     //New fork
-                    if (forkArray.findIndex(val => val[0] === target) === -1) {
+                    let forkIndex = forkArray.findIndex(val => val[0] === target);
+                    if (forkIndex === -1) {
                         forkArray.push([target, pathLength]);
                     } else {
-                    //Old fork, solve it
-                        
+                        //Old fork, solve it
+                        let maxElevation;
+                        if (pathLength > forkArray[forkIndex[1]]) {
+                            maxElevation = pathLength;
+                        } else maxElevation = forkArray[forkIndex[1]];
+                        elevation[target] = maxElevation;
                     }
                 }
             }
