@@ -105,7 +105,7 @@ class Board {
 
         if (array[i] !== 1) {
             answerArray.push(array[i])
-        } else console.log(answerArray)
+        }
         return answerArray;
     }
 
