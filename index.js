@@ -119,50 +119,92 @@ class Board {
         let forkArray = [];
         for (let i = 0; i < targetsArray.length; i++) {
             let pathLength = 1;
-            let target = targetsArray[i];
+            let current = targetsArray[i];
             let noFork = true;
+            //While runs until finding an unresolvable fork
+            printBoard(this.board, arrayWidth)
+            console.log(("------------------"))
+            printBoard(elevation, arrayWidth)
             while (noFork) {
-                let adjs = this._getAdjacent(target, array, arrayWidth, arrayHeight);
+                let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
                 let sideFlag = 0;
-                if (adjs.length < 3) {
-                    while (sideFlag < 2) {
-                        let aux = 0;
-                        switch (adjs[sideFlag]) {
-                            case 2:
-                                aux = target-arrayWidth;
-                                break;
-                            case 3:
-                                aux = target+1;
-                                break;
-                            case 4:
-                                aux = target+arrayWidth;
-                                break;
-                            case 5:
-                                aux = target-1;
-                                break;
-                            default:
-                                break;
-                        }
-                        if (elevation[aux] === 0) {
-                            target = aux
-                            sideFlag++;
-                        }
-                        sideFlag++;
+                //Within the while it's decided in which direction to go on
+                while (sideFlag < 4) {
+                    //Switch gets index of prospective move
+                    let aux = 0;
+                    switch (adjs[sideFlag]) {
+                        case 2:
+                            aux = current-arrayWidth;
+                            break;
+                        case 3:
+                            aux = current+1;
+                            break;
+                        case 4:
+                            aux = current+arrayWidth;
+                            break;
+                        case 5:
+                            aux = current-1;
+                            break;
+                        default:
+                            break;
                     }
+
+                    let forkIndex = forkArray.findIndex(val => val[0] === aux);
+                    let auxAdjs = this._getAdjacent(aux, array, arrayWidth, arrayHeight);
+                    //Check whether the tile's already been done or if it's a fork to solve
                     pathLength++;
-                    elevation[target] = pathLength;
-                } else {
-                    //New fork
-                    let fork = forkArray.findIndex(val => val[0] === target);
-                    if (fork === -1) {
-                        forkArray.push([target, pathLength]);
-                        noFork = false;
-                    } else {
-                        //Old fork, solve it
-                        let maxElevation = Math.max(pathLength, forkArray[fork][1]);
-                        elevation[target] = maxElevation;
+                    current = aux;
+                    if (elevation[aux] === 0) {
+                        //Normal advance
+                        sideFlag = 3;
+                        //New fork, add it to the list, and end outer while
+                        if (auxAdjs.length > 2) {
+                            forkArray.push([current, pathLength]);
+                            noFork = false;
+                        }
+                    //Fork already exists
+                    } else if (forkIndex !== -1) {
+                        //Since all sides are accounted for, solve it
+                        if (auxAdjs.length === 3) {
+                            pathLength = Math.max(pathLength, forkArray[forkIndex][1]);
+                            forkArray.splice(forkIndex, 1);
+                        } else if (auxAdjs.length === 4) {
+                            //empty means number of empty tiles adj to fork
+                            let empty = 0;
+                            for (let j = 0; j < auxAdjs.length; j++) {
+                                let secondAux;
+                                switch (auxAdjs[j]) {
+                                    case 2:
+                                        secondAux = aux-arrayWidth;
+                                        break;
+                                    case 3:
+                                        secondAux = aux+1;
+                                        break;
+                                    case 4:
+                                        secondAux = aux+arrayWidth;
+                                        break;
+                                    case 5:
+                                        secondAux = aux-1;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (elevation[secondAux] === 0) empty++;
+                            }
+
+                            pathLength = Math.max(pathLength, forkArray[forkIndex][1]);
+                            //Can't solve fork yet, store greatest pathLength
+                            if (empty === 1) {
+                                forkArray.splice(forkIndex, 1);
+                            }
+                        } else {
+                            throw new Error("auxAdjs has an impossible length");
+                        }
                     }
+                    sideFlag++;
                 }
+                //Actual move
+                elevation[current] = pathLength;
             }
         }
 
