@@ -90,17 +90,22 @@ class Board {
         if (coordY!==0 && array[i-arrayWidth] === 4) {
             answerArray.push(2);
         //If there's a block on the right
-        } else if (coordX!==arrayWidth-1 && array[i+1] === 5) {
+        }
+        if (coordX!==arrayWidth-1 && array[i+1] === 5) {
             answerArray.push(3)
         //If there's a block below
-        } else if (coordY!==arrayHeight-1 && array[i+arrayWidth] === 2) {
+        }
+        if (coordY!==arrayHeight-1 && array[i+arrayWidth] === 2) {
             answerArray.push(4)
         //If there's a block on the left
-        } else if (coordX!==0 && array[i-1] === 3) {
+        }
+        if (coordX!==0 && array[i-1] === 3) {
             answerArray.push(5)
         }
 
-        if (array[i] !== 1) answerArray.push(array[i]);
+        if (array[i] !== 1) {
+            answerArray.push(array[i])
+        } else console.log(answerArray)
         return answerArray;
     }
 
