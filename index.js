@@ -99,6 +99,8 @@ class Board {
         } else if (coordX!==0 && array[i-1] === 3) {
             answerArray.push(5)
         }
+
+        if (array[i] !== 1) answerArray.push(array[i]);
         return answerArray;
     }
 
