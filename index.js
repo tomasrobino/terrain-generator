@@ -157,7 +157,7 @@ class Board {
                             printBoard(elevation, arrayWidth)
                             console.log(adjs)
                             console.log(sideFlag)
-                            throw new Error("finish?");
+                            process.exit(0)
                     }
 
                     let forkIndex = forkArray.findIndex(val => val[0] === aux);
