@@ -105,7 +105,7 @@ class Board {
 
         if (array[i] !== 1) {
             answerArray.push(array[i])
-        } else console.log(array[i]);
+        }
         return answerArray;
     }
 
@@ -137,7 +137,7 @@ class Board {
                 let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
                 let sideFlag = 0;
                 //Within the while it's decided in which direction to go on
-                while (sideFlag < 4) {
+                while (sideFlag < adjs.length) {
                     //Switch gets index of prospective move
                     let aux = 0;
                     switch (adjs[sideFlag]) {
@@ -154,7 +154,10 @@ class Board {
                             aux = current-1;
                             break;
                         default:
-                            break;
+                            printBoard(elevation, arrayWidth)
+                            console.log(adjs)
+                            console.log(sideFlag)
+                            throw new Error("finish?");
                     }
 
                     let forkIndex = forkArray.findIndex(val => val[0] === aux);
@@ -209,7 +212,12 @@ class Board {
                         } else {
                             throw new Error("auxAdjs has an impossible length");
                         }
-                    } else pathLength--;
+                    } else {
+                        if (sideFlag === adjs.length-1) {
+                            noFork = false;
+                        }
+                        pathLength--
+                    }
                     sideFlag++;
                 }
                 //Actual move
