@@ -105,7 +105,7 @@ class Board {
 
         if (array[i] !== 1) {
             answerArray.push(array[i])
-        }
+        } else console.log(array[i]);
         return answerArray;
     }
 
@@ -130,9 +130,11 @@ class Board {
             let noFork = true;
             //While runs until finding an unresolvable fork
             printBoard(this.board, arrayWidth)
-            console.log(("------------------"))
+            console.log("------------------")
             printBoard(elevation, arrayWidth)
+            console.log("end")
             while (noFork) {
+                console.log("outer while")
                 let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
                 let sideFlag = 0;
                 //Within the while it's decided in which direction to go on
@@ -203,6 +205,7 @@ class Board {
                             //Can't solve fork yet, store greatest pathLength
                             if (empty === 1) {
                                 forkArray.splice(forkIndex, 1);
+                                noFork = false;
                             }
                         } else {
                             throw new Error("auxAdjs has an impossible length");
