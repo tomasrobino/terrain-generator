@@ -134,7 +134,6 @@ class Board {
             printBoard(elevation, arrayWidth)
             console.log("end")
             while (noFork) {
-                console.log("outer while")
                 let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
                 let sideFlag = 0;
                 //Within the while it's decided in which direction to go on
@@ -210,7 +209,7 @@ class Board {
                         } else {
                             throw new Error("auxAdjs has an impossible length");
                         }
-                    }
+                    } else pathLength--;
                     sideFlag++;
                 }
                 //Actual move
