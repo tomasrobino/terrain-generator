@@ -137,7 +137,7 @@ class Board {
             answerArray.push(5)
         }
 
-        if (array[i] !== 1) {
+        if (array[i] !== 1 && array[i] !== 0) {
             answerArray.push(array[i])
         }
         return answerArray;
@@ -187,7 +187,7 @@ class Board {
                             printBoard(this.board, this.width);
                             console.log("--------------------");
                             printElevation(elevation, arrayWidth);
-                            throw new Error("adjs element with zero");
+                            throw new Error("adjs element with invalid number");
                     }
 
                     let forkIndex = forkArray.findIndex(val => val[0] === aux);
