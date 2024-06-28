@@ -129,10 +129,6 @@ class Board {
             let current = targetsArray[i];
             let noFork = true;
             //While runs until finding an unresolvable fork
-            printBoard(this.board, arrayWidth)
-            console.log("------------------")
-            printBoard(elevation, arrayWidth)
-            console.log("end")
             while (noFork) {
                 let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
                 let sideFlag = 0;
@@ -155,17 +151,13 @@ class Board {
                             break;
                         default:
                             printBoard(elevation, arrayWidth)
-                            //console.log(adjs)
-                            //console.log(sideFlag)
-                            process.exit(0)
+                            process.exit(1)
                     }
 
                     let forkIndex = forkArray.findIndex(val => val[0] === aux);
                     let auxAdjs = this._getAdjacent(aux, array, arrayWidth, arrayHeight);
                     //Check whether the tile's already been done or if it's a fork to solve
                     pathLength++;
-                    console.log(current);
-                    console.log(aux)
                     let oldCurrent = current;
                     current = aux;
                     if (elevation[aux] === 0) {
@@ -228,7 +220,10 @@ class Board {
                 elevation[current] = pathLength;
             }
         }
-
+        printBoard(this.board, arrayWidth)
+        console.log("------------------")
+        printBoard(elevation, arrayWidth)
+        process.exit(0)
         return elevation;
     }
 
