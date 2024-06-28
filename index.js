@@ -17,12 +17,46 @@ function printBoard(board, currentWidth) {
     for (let x = 0; x < Math.floor(board.length/currentWidth); x++) {
         let arr = [];
         for (let z = 0; z < currentWidth; z++) {
-            arr.push(board[x*currentWidth + z]);
+            let element = board[x*currentWidth + z];
+            switch (element) {
+                case 0:
+                    element = `\u{1b}[90m ${element} \u{1b}[0m`;
+                    break;
+                case 1:
+                    element = `\u{1b}[32m ${element} \u{1b}[0m`;
+                    break;
+                case 2:
+                    element = `\u{1b}[33m ${element} \u{1b}[0m`;
+                    break;
+                case 3:
+                    element = `\u{1b}[34m ${element} \u{1b}[0m`;
+                    break;
+                case 4:
+                    element = `\u{1b}[35m ${element} \u{1b}[0m`;
+                    break;
+                case 5:
+                    element = `\u{1b}[36m${element}\u{1b}[0m`;
+                    break;
+            }
+            arr.push(element);
         }
-        console.log(arr);
+        console.log(arr.join(""));
     }
 }
 
+function printElevation(elevation, currentWidth) {
+    for (let x = 0; x < Math.floor(elevation.length/currentWidth); x++) {
+        let arr = [];
+        for (let z = 0; z < currentWidth; z++) {
+            let element = elevation[x*currentWidth + z];
+            if (element !== 0) {
+                element = `\u{1b}[91m${element} \u{1b}[0m`;
+            } else element = `\u{1b}[30m${element} \u{1b}[0m`;
+            arr.push(element);
+        }
+        console.log(arr.join(""));
+    }
+}
 class Board {
     static blockCounter = 0;
 
@@ -152,7 +186,7 @@ class Board {
                         default:
                             printBoard(this.board, this.width);
                             console.log("--------------------");
-                            printBoard(elevation, arrayWidth);
+                            printElevation(elevation, arrayWidth);
                             throw new Error("adjs element with zero");
                     }
 
@@ -310,6 +344,9 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
+        console.log(this.elevation)
+        printElevation(this.elevation, this.width)
+        console.log("------------------------------")
     }
 }
 
