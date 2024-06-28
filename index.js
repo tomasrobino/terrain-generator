@@ -155,8 +155,8 @@ class Board {
                             break;
                         default:
                             printBoard(elevation, arrayWidth)
-                            console.log(adjs)
-                            console.log(sideFlag)
+                            //console.log(adjs)
+                            //console.log(sideFlag)
                             process.exit(0)
                     }
 
@@ -164,6 +164,9 @@ class Board {
                     let auxAdjs = this._getAdjacent(aux, array, arrayWidth, arrayHeight);
                     //Check whether the tile's already been done or if it's a fork to solve
                     pathLength++;
+                    console.log(current);
+                    console.log(aux)
+                    let oldCurrent = current;
                     current = aux;
                     if (elevation[aux] === 0) {
                         //Normal advance
@@ -216,6 +219,7 @@ class Board {
                         if (sideFlag === adjs.length-1) {
                             noFork = false;
                         }
+                        current = oldCurrent;
                         pathLength--
                     }
                     sideFlag++;
