@@ -59,6 +59,7 @@ function printElevation(elevation, currentWidth) {
 }
 class Board {
     static blockCounter = 0;
+    static root;
 
     static getBlockCounter() {
         return this.blockCounter;
@@ -72,24 +73,33 @@ class Board {
         this.blockCounter++;
     }
 
-    constructor(height, width, root, rootElevation, rootHeight, rootWidth) {
+    static getRoot() {
+        return this.root;
+    }
+
+    static setRoot(value) {
+        this.root = value;
+    }
+
+    constructor(height, width, origin = [1], originElevation = [0], originHeight = 1, originWidth = 1) {
         this.height = height;
         this.width = width;
-        this.root = new Uint8Array(root);
-        this.rootElevation = new Uint16Array(rootElevation);
-        this.rootHeight = rootHeight;
-        this.rootWidth = rootWidth;
+        this.origin = new Uint8Array(origin);
+        this.originElevation = new Uint16Array(originElevation);
+        this.originHeight = originHeight;
+        this.originWidth = originWidth;
         this.board = new Uint8Array(height*width);
         
         let offset = 0;
-        if (root.length===1) {
+        if (origin.length===1) {
             this.board[randomSingle(Math.floor((this.height*this.width)))] = 1;
+            Board.setRoot(origin[0]);
             Board.addBlockCounter();
         } else {
-            for (let i = 0; i < root.length; i++) {
-                if (root[i] !== 0) {
-                    this.board[(2*i)+offset] = root[i];
-                    switch (root[i]) {
+            for (let i = 0; i < origin.length; i++) {
+                if (origin[i] !== 0) {
+                    this.board[(2*i)+offset] = origin[i];
+                    switch (origin[i]) {
                         case 2:
                             this.board[(2*i)+offset-this.width] = 2;
                             break;
@@ -106,7 +116,7 @@ class Board {
                             break;
                     }
                 }
-                if ((i+1)%this.rootWidth === 0) {
+                if ((i+1)%this.originWidth === 0) {
                     offset += this.width;
                 }
             }
@@ -356,7 +366,7 @@ class Board {
 
 
 let boardArray = [];
-boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
+boardArray[0] = new Board(HEIGHT, WIDTH);
 boardArray[0].saveToFile("results/stage1.gif");
 
 for (let i = 1; i < STAGES_AMOUNT; i++) {
