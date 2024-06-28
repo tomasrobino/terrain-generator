@@ -144,6 +144,7 @@ class Board {
     }
 
     _calcElevation(array, arrayWidth, arrayHeight) {
+        /*
         let elevation = new Uint16Array(array.length);
         let targetsArray = [];
         //Finding the ends and filling targetsArray
@@ -257,6 +258,9 @@ class Board {
             }
         }
         return elevation;
+        */
+
+
     }
 
     _populate() {
