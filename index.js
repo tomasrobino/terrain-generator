@@ -317,3 +317,8 @@ class Board {
 let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
 boardArray[0].saveToFile("results/stage1.gif");
+
+for (let i = 1; i < STAGES_AMOUNT; i++) {
+    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
+    boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
+}
