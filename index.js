@@ -150,8 +150,10 @@ class Board {
                             aux = current-1;
                             break;
                         default:
-                            printBoard(elevation, arrayWidth)
-                            process.exit(1)
+                            printBoard(this.board, this.width);
+                            console.log("--------------------");
+                            printBoard(elevation, arrayWidth);
+                            throw new Error("adjs element with zero");
                     }
 
                     let forkIndex = forkArray.findIndex(val => val[0] === aux);
@@ -220,10 +222,6 @@ class Board {
                 elevation[current] = pathLength;
             }
         }
-        printBoard(this.board, arrayWidth)
-        console.log("------------------")
-        printBoard(elevation, arrayWidth)
-        process.exit(0)
         return elevation;
     }
 
@@ -319,8 +317,3 @@ class Board {
 let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
 boardArray[0].saveToFile("results/stage1.gif");
-
-for (let i = 1; i < STAGES_AMOUNT; i++) {
-    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
-    boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
-}
