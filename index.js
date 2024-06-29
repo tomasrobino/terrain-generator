@@ -50,8 +50,8 @@ function printElevation(elevation, currentWidth) {
         for (let z = 0; z < currentWidth; z++) {
             let element = elevation[x*currentWidth + z];
             if (element !== 0) {
-                element = `\u{1b}[91m${element} \u{1b}[0m`;
-            } else element = `\u{1b}[30m${element} \u{1b}[0m`;
+                element = `\u{1b}[91m${element}  \u{1b}[0m`;
+            } else element = `\u{1b}[30m${element}  \u{1b}[0m`;
             arr.push(element);
         }
         console.log(arr.join(""));
@@ -89,11 +89,13 @@ class Board {
         this.originHeight = originHeight;
         this.originWidth = originWidth;
         this.board = new Uint8Array(height*width);
+        this.elevation = [];
         
         let offset = 0;
         if (origin.length===1) {
-            this.board[randomSingle(Math.floor((this.height*this.width)))] = 1;
-            Board.setRoot(origin[0]);
+            let random = randomSingle(Math.floor((this.height*this.width)));
+            this.board[random] = 1;
+            Board.setRoot(random);
             Board.addBlockCounter();
         } else {
             for (let i = 0; i < origin.length; i++) {
@@ -147,6 +149,7 @@ class Board {
             answerArray.push(5)
         }
 
+        //Adds block i points to
         if (array[i] !== 1 && array[i] !== 0) {
             answerArray.push(array[i])
         }
@@ -270,7 +273,56 @@ class Board {
         return elevation;
         */
 
+        let elevation = new Uint16Array(array.length);
+        elevation[Board.getRoot()] = 1;
+        let targetsArray = [1];
+        let done = false;
+        let current;
+        let pathLength = 2;
+        let newTargets = [];
 
+        while (!done) {
+            if (targetsArray.length === 0) done = true;
+            for (let i = 0; i < targetsArray.length; i++) {
+                current = targetsArray[i];
+                let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
+                let sideFlag = 0;
+
+                while (sideFlag < adjs.length) {
+                    let aux;
+                    switch (adjs[sideFlag]) {
+                        case 2:
+                            aux = current-arrayWidth;
+                            break;
+                        case 3:
+                            aux = current+1;
+                            break;
+                        case 4:
+                            aux = current+arrayWidth;
+                            break;
+                        case 5:
+                            aux = current-1;
+                            break;
+                        default:
+                            printBoard(this.board, this.width);
+                            console.log("--------------------");
+                            printElevation(elevation, arrayWidth);
+                            throw new Error("adjs element with invalid number");
+                    }
+
+                    if (elevation[aux] === 0 || elevation[aux] < pathLength) {
+                        elevation[aux] = pathLength;
+                        newTargets.push(aux);
+                    }
+                }
+            }
+            targetsArray = Array.from(newTargets);
+            newTargets = [];
+            pathLength++;
+            printElevation(elevation, arrayWidth)
+            console.log("-----------------------")
+        }
+        return elevation;
     }
 
     _populate() {
@@ -358,7 +410,6 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
-        console.log(this.elevation)
         printElevation(this.elevation, this.width)
         console.log("------------------------------")
     }
@@ -369,7 +420,10 @@ let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH);
 boardArray[0].saveToFile("results/stage1.gif");
 
+/*
 for (let i = 1; i < STAGES_AMOUNT; i++) {
     boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
+
+ */
