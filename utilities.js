@@ -1,10 +1,10 @@
 //Returns one random integer, bounded by max and min
-export function randomSingle(max, min = 0) {
+function randomSingle(max, min = 0) {
     return Math.floor( Math.random() * (max-min) + min );
 }
 
 //Only for testing
-export function printBoard(board, currentWidth) {
+function printBoard(board, currentWidth) {
     for (let x = 0; x < Math.floor(board.length/currentWidth); x++) {
         let arr = [];
         for (let z = 0; z < currentWidth; z++) {
@@ -35,7 +35,7 @@ export function printBoard(board, currentWidth) {
     }
 }
 
-export function printElevation(elevation, currentWidth) {
+function printElevation(elevation, currentWidth) {
     for (let x = 0; x < Math.floor(elevation.length/currentWidth); x++) {
         let arr = [];
         for (let z = 0; z < currentWidth; z++) {
@@ -48,3 +48,7 @@ export function printElevation(elevation, currentWidth) {
         console.log(arr.join(""));
     }
 }
+
+exports.randomSingle = randomSingle;
+exports.printBoard = printBoard;
+exports.printElevation = printElevation;
