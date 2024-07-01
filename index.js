@@ -130,7 +130,7 @@ class Board {
                     offset += this.width;
                 }
             }
-            printElevation(this.elevation, this.width);
+            this._populate();
         }
     }
 
