@@ -1,4 +1,5 @@
 const sharp = require("sharp");
+const {printElevation, printBoard, randomSingle} = require("./utilities");
 
 
 const WIDTH = parseInt(process.argv[2]);
@@ -7,56 +8,6 @@ const PERCENTAGE_FILLED = parseFloat(process.argv[4]);
 const STAGES_AMOUNT = parseInt(process.argv[5]);
 
 
-//Returns one random integer, bounded by max and min
-function randomSingle(max, min = 0) {
-    return Math.floor( Math.random() * (max-min) + min );
-}
-
-//Only for testing
-function printBoard(board, currentWidth) {
-    for (let x = 0; x < Math.floor(board.length/currentWidth); x++) {
-        let arr = [];
-        for (let z = 0; z < currentWidth; z++) {
-            let element = board[x*currentWidth + z];
-            switch (element) {
-                case 0:
-                    element = `\u{1b}[90m ${element} \u{1b}[0m`;
-                    break;
-                case 1:
-                    element = `\u{1b}[32m ${element} \u{1b}[0m`;
-                    break;
-                case 2:
-                    element = `\u{1b}[33m ${element} \u{1b}[0m`;
-                    break;
-                case 3:
-                    element = `\u{1b}[34m ${element} \u{1b}[0m`;
-                    break;
-                case 4:
-                    element = `\u{1b}[35m ${element} \u{1b}[0m`;
-                    break;
-                case 5:
-                    element = `\u{1b}[36m${element}\u{1b}[0m`;
-                    break;
-            }
-            arr.push(element);
-        }
-        console.log(arr.join(""));
-    }
-}
-
-function printElevation(elevation, currentWidth) {
-    for (let x = 0; x < Math.floor(elevation.length/currentWidth); x++) {
-        let arr = [];
-        for (let z = 0; z < currentWidth; z++) {
-            let element = elevation[x*currentWidth + z];
-            if (element !== 0) {
-                element = `\u{1b}[91m${element}  \u{1b}[0m`;
-            } else element = `\u{1b}[30m${element}  \u{1b}[0m`;
-            arr.push(element);
-        }
-        console.log(arr.join(""));
-    }
-}
 class Board {
     static blockCounter = 0;
     static root;
@@ -344,4 +295,3 @@ for (let i = 1; i < STAGES_AMOUNT; i++) {
     boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, boardArray[i-1].elevation, boardArray[i-1].height, boardArray[i-1].width);
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
-
