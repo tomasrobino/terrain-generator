@@ -167,8 +167,8 @@ class Board {
 
     }
 
-    _calcElevation(array, arrayWidth, arrayHeight) {
-        let elevation = new Uint16Array(array.length);
+    _calcElevation() {
+        let elevation = new Uint16Array(this.board.length);
         let targetsArray = [Board.getRoot()];
         let done = false;
         let current;
@@ -181,30 +181,30 @@ class Board {
                 if (elevation[current] === 0) {
                     elevation[current] = pathLength
                 } else continue;
-                let adjs = this._getAdjacent(current, array, arrayWidth, arrayHeight);
+                let adjs = this._getAdjacent(current, this.board, this.width, this.height);
 
                 for (let g = 0; g < adjs.length; g++) {
                     let aux;
                     switch (adjs[g]) {
                         case 2:
-                            aux = current-arrayWidth;
+                            aux = current-this.width;
                             break;
                         case 3:
                             aux = current+1;
                             break;
                         case 4:
-                            aux = current+arrayWidth;
+                            aux = current+this.width;
                             break;
                         case 5:
                             aux = current-1;
                             break;
                         default:
-                            printBoard(array, this.width);
+                            printBoard(this.board, this.width);
                             console.log("--------------------");
-                            printElevation(elevation, arrayWidth);
+                            printElevation(elevation, this.width);
                             throw new Error("adjs element with invalid number");
                     }
-                    if (array[aux] !== 0 && elevation[aux] === 0 && !newTargets.includes(aux)) newTargets.push(aux);
+                    if (this.board[aux] !== 0 && elevation[aux] === 0 && !newTargets.includes(aux)) newTargets.push(aux);
                 }
             }
             targetsArray = Array.from(newTargets);
@@ -217,8 +217,8 @@ class Board {
         // y = pathLength - x + 1
         // x + (y-x)
         pathLength--;
-        for (let i = 0; i < array.length; i++) {
-            if (array[i] !== 0) {
+        for (let i = 0; i < this.board.length; i++) {
+            if (this.board[i] !== 0) {
                 elevation[i] = elevation[i] + ((pathLength - elevation[i] + 1) - elevation[i]);
             }
         }
@@ -298,7 +298,7 @@ class Board {
             } while (flag);
         }
 
-        return this._calcElevation(this.board, this.width, this.height);
+        return this._calcElevation();
     }
 
     saveToFile(destination) {
