@@ -165,7 +165,6 @@ class Board {
         let newTargets = [];
 
         while (!done) {
-            if (targetsArray.length === 0) done = true;
             for (let i = 0; i < targetsArray.length; i++) {
                 current = targetsArray[i];
                 if (elevation[current] === 0) {
@@ -194,13 +193,28 @@ class Board {
                             printElevation(elevation, arrayWidth);
                             throw new Error("adjs element with invalid number");
                     }
-                    if (array[aux] !== 0) newTargets.push(aux);
+                    if (array[aux] !== 0 && elevation[aux] === 0 && !newTargets.includes(aux)) newTargets.push(aux);
                 }
             }
             targetsArray = Array.from(newTargets);
+            if (targetsArray.length === 0) done = true;
             newTargets = [];
             pathLength++;
         }
+        
+        //Inverting height values
+        // y = pathLength - x + 1
+        // x + (y-x)
+        pathLength--;
+        printElevation(elevation, arrayWidth)
+        console.log("---------------------")
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] !== 0) {
+                elevation[i] = elevation[i] + ((pathLength - elevation[i] + 1) - elevation[i]);
+            }
+        }
+        printElevation(elevation, arrayWidth)
+        console.log("---------------------")
         return elevation;
     }
 
@@ -289,8 +303,8 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
-        printElevation(this.elevation, this.width)
-        console.log("------------------------------")
+        //printElevation(this.elevation, this.width)
+        //console.log("------------------------------")
     }
 }
 
