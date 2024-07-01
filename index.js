@@ -85,7 +85,7 @@ class Board {
         this.height = height;
         this.width = width;
         this.origin = new Uint8Array(origin);
-        this.originElevation = this._copyElevation(originElevation);
+        this.originElevation = originElevation;
         this.originHeight = originHeight;
         this.originWidth = originWidth;
         this.board = new Uint8Array(height*width);
@@ -96,7 +96,8 @@ class Board {
             this.board[random] = 1;
             Board.setRoot(random);
             Board.addBlockCounter();
-            this.elevation = this._populate();
+            this._populate();
+            this.elevation = this._calcElevation();
         } else {
             this.elevation = new Uint16Array(height*width);
             for (let i = 0; i < origin.length; i++) {
@@ -131,6 +132,22 @@ class Board {
                 }
             }
             this._populate();
+            let targets = [];
+            let max = Math.max(...this.elevation);
+            printElevation(this.elevation, this.width);
+            for (let i = 0; i < this.board.length; i++) {
+                if (this.board[i] !== 0) {
+                    if (this.elevation[i] === 0) {
+                        targets.push(i);
+                    } else {
+                        //Invert
+                        this.elevation[i] = this.elevation[i] + ((max - this.elevation[i] + 1) - this.elevation[i]);
+                    }
+                }
+            }
+            console.log("------------------");
+            printElevation(this.elevation, this.width);
+            this.elevation = this._calcElevation(targets, max);
         }
     }
 
@@ -163,16 +180,19 @@ class Board {
         return answerArray;
     }
 
-    _copyElevation(originElevation) {
-
-    }
-
-    _calcElevation() {
+    _calcElevation(targets = [], max = 0) {
         let elevation = new Uint16Array(this.board.length);
-        let targetsArray = [Board.getRoot()];
+        let targetsArray;
+        let pathLength
+        if (targets.length === 0) {
+            targetsArray = [Board.getRoot()];
+            pathLength = 1;
+        } else {
+            targetsArray = Array.from(targets);
+            pathLength = max+1;
+        }
         let done = false;
         let current;
-        let pathLength = 1;
         let newTargets = [];
 
         while (!done) {
@@ -217,6 +237,8 @@ class Board {
         // y = pathLength - x + 1
         // x + (y-x)
         pathLength--;
+        //printElevation(elevation, this.width)
+        //console.log("---------------------------")
         for (let i = 0; i < this.board.length; i++) {
             if (this.board[i] !== 0) {
                 elevation[i] = elevation[i] + ((pathLength - elevation[i] + 1) - elevation[i]);
@@ -297,8 +319,6 @@ class Board {
                 }
             } while (flag);
         }
-
-        return this._calcElevation();
     }
 
     saveToFile(destination) {
@@ -310,6 +330,7 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
+        //printElevation(this.elevation, this.width)
     }
 }
 
@@ -318,10 +339,9 @@ let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH);
 boardArray[0].saveToFile("results/stage1.gif");
 
-/*
+
 for (let i = 1; i < STAGES_AMOUNT; i++) {
     boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, boardArray[i-1].elevation, boardArray[i-1].height, boardArray[i-1].width);
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
 
- */
