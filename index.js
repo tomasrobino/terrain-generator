@@ -85,53 +85,60 @@ class Board {
         this.height = height;
         this.width = width;
         this.origin = new Uint8Array(origin);
-        this.originElevation = new Uint16Array(originElevation);
+        this.originElevation = this._copyElevation(originElevation);
         this.originHeight = originHeight;
         this.originWidth = originWidth;
         this.board = new Uint8Array(height*width);
-        this.elevation = [];
-        
+
         let offset = 0;
         if (origin.length===1) {
             let random = randomSingle(Math.floor((this.height*this.width)));
             this.board[random] = 1;
             Board.setRoot(random);
             Board.addBlockCounter();
+            this.elevation = this._populate();
         } else {
+            this.elevation = new Uint16Array(height*width);
             for (let i = 0; i < origin.length; i++) {
                 if (origin[i] !== 0) {
                     this.board[(2*i)+offset] = origin[i];
+                    this.elevation[(2*i)+offset] = originElevation[i];
                     switch (origin[i]) {
                         case 2:
                             this.board[(2*i)+offset-this.width] = 2;
+                            this.elevation[(2*i)+offset-this.width] = originElevation[i];
                             break;
                         case 3:
                             this.board[(2*i)+offset+1] = 3;
+                            this.elevation[(2*i)+offset+1] = originElevation[i];
                             break;
                         case 4:
                             this.board[(2*i)+offset+this.width] = 4;
+                            this.elevation[(2*i)+offset+this.width] = originElevation[i];
                             break;
                         case 5:
                             this.board[(2*i)+offset-1] = 5;
+                            this.elevation[(2*i)+offset-1] = originElevation[i];
                             break;
                         default:
                             break;
                     }
+
+
                 }
                 if ((i+1)%this.originWidth === 0) {
                     offset += this.width;
                 }
             }
+            printElevation(this.elevation, this.width);
         }
-
-        this.elevation = this._populate();
     }
 
     _getAdjacent(i, array, arrayWidth, arrayHeight) {
         let coordY = Math.floor(i/arrayWidth);
         let coordX = i%arrayWidth;
         let answerArray = [];
-        
+
         //If there's a block above
         if (coordY!==0 && array[i-arrayWidth] === 4) {
             answerArray.push(2);
@@ -154,6 +161,10 @@ class Board {
             answerArray.push(array[i])
         }
         return answerArray;
+    }
+
+    _copyElevation(originElevation) {
+
     }
 
     _calcElevation(array, arrayWidth, arrayHeight) {
@@ -201,20 +212,16 @@ class Board {
             newTargets = [];
             pathLength++;
         }
-        
+
         //Inverting height values
         // y = pathLength - x + 1
         // x + (y-x)
         pathLength--;
-        printElevation(elevation, arrayWidth)
-        console.log("---------------------")
         for (let i = 0; i < array.length; i++) {
             if (array[i] !== 0) {
                 elevation[i] = elevation[i] + ((pathLength - elevation[i] + 1) - elevation[i]);
             }
         }
-        printElevation(elevation, arrayWidth)
-        console.log("---------------------")
         return elevation;
     }
 
@@ -227,9 +234,9 @@ class Board {
                 if (this.board[random] === 0) {
                     randomFlag = false;
                 }
-                
+
             } while (randomFlag);
-            
+
             //Moving new block
             let flag = true;
             //Check if adjacent to other block
@@ -303,8 +310,6 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
-        //printElevation(this.elevation, this.width)
-        //console.log("------------------------------")
     }
 }
 
@@ -315,7 +320,7 @@ boardArray[0].saveToFile("results/stage1.gif");
 
 /*
 for (let i = 1; i < STAGES_AMOUNT; i++) {
-    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
+    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, boardArray[i-1].elevation, boardArray[i-1].height, boardArray[i-1].width);
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
 
