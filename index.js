@@ -47,30 +47,22 @@ class Board {
             this.board[random] = 1;
             Board.setRoot(random);
             Board.addBlockCounter();
-            this._populate();
-            this._calcElevation();
         } else {
-            this.elevation = new Uint16Array(height*width);
             for (let i = 0; i < origin.length; i++) {
                 if (origin[i] !== 0) {
                     this.board[(2*i)+offset] = origin[i];
-                    this.elevation[(2*i)+offset] = originElevation[i];
                     switch (origin[i]) {
                         case 2:
                             this.board[(2*i)+offset-this.width] = 2;
-                            this.elevation[(2*i)+offset-this.width] = originElevation[i];
                             break;
                         case 3:
                             this.board[(2*i)+offset+1] = 3;
-                            this.elevation[(2*i)+offset+1] = originElevation[i];
                             break;
                         case 4:
                             this.board[(2*i)+offset+this.width] = 4;
-                            this.elevation[(2*i)+offset+this.width] = originElevation[i];
                             break;
                         case 5:
                             this.board[(2*i)+offset-1] = 5;
-                            this.elevation[(2*i)+offset-1] = originElevation[i];
                             break;
                         default:
                             break;
@@ -82,24 +74,9 @@ class Board {
                     offset += this.width;
                 }
             }
-            this._populate();
-            let targets = [];
-            let max = Math.max(...this.elevation);
-            printElevation(this.elevation, this.width);
-            for (let i = 0; i < this.board.length; i++) {
-                if (this.board[i] !== 0) {
-                    if (this.elevation[i] === 0) {
-                        targets.push(i);
-                    } else {
-                        //Invert
-                        this.elevation[i] = this.elevation[i] + ((max - this.elevation[i] + 1) - this.elevation[i]);
-                    }
-                }
-            }
-            console.log("------------------");
-            printElevation(this.elevation, this.width);
-            this._calcElevation(targets, max);
         }
+        this._populate();
+        this._calcElevation();
     }
 
     _getAdjacent(i, array, arrayWidth, arrayHeight) {
@@ -131,17 +108,12 @@ class Board {
         return answerArray;
     }
 
-    _calcElevation(targets = [], max = 0) {
+    _calcElevation() {
         let targetsArray;
         let pathLength
-        if (targets.length === 0) {
-            this.elevation = new Uint16Array(this.board.length);
-            targetsArray = [Board.getRoot()];
-            pathLength = 1;
-        } else {
-            targetsArray = Array.from(targets);
-            pathLength = max+1;
-        }
+        this.elevation = new Uint16Array(this.board.length);
+        targetsArray = [Board.getRoot()];
+        pathLength = 1;
         let done = false;
         let current;
         let newTargets = [];
@@ -188,8 +160,6 @@ class Board {
         // y = pathLength - x + 1
         // x + (y-x)
         pathLength--;
-        //printElevation(elevation, this.width)
-        //console.log("---------------------------")
         for (let i = 0; i < this.board.length; i++) {
             if (this.board[i] !== 0) {
                 this.elevation[i] = this.elevation[i] + ((pathLength - this.elevation[i] + 1) - this.elevation[i]);
@@ -280,7 +250,7 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
-        //printElevation(this.elevation, this.width)
+        printElevation(this.elevation, this.width)
     }
 }
 
