@@ -49,6 +49,9 @@ class Board {
             Board.addBlockCounter();
         } else {
             for (let i = 0; i < origin.length; i++) {
+                if (i === Board.getRoot()) {
+                    Board.setRoot((2*Board.getRoot())+offset);
+                }
                 if (origin[i] !== 0) {
                     this.board[(2*i)+offset] = origin[i];
                     switch (origin[i]) {
@@ -75,6 +78,7 @@ class Board {
                 }
             }
         }
+        this.elevation = new Uint16Array(this.board.length);
         this._populate();
         this._calcElevation();
     }
@@ -111,7 +115,7 @@ class Board {
     _calcElevation() {
         let targetsArray;
         let pathLength
-        this.elevation = new Uint16Array(this.board.length);
+        //this.elevation = new Uint16Array(this.board.length);
         targetsArray = [Board.getRoot()];
         pathLength = 1;
         let done = false;
@@ -155,16 +159,16 @@ class Board {
             newTargets = [];
             pathLength++;
         }
-
         //Inverting height values
         // y = pathLength - x + 1
         // x + (y-x)
         pathLength--;
         for (let i = 0; i < this.board.length; i++) {
-            if (this.board[i] !== 0) {
+            if (this.board[i] !== 0 && this.elevation[i] !== 0) {
                 this.elevation[i] = this.elevation[i] + ((pathLength - this.elevation[i] + 1) - this.elevation[i]);
             }
         }
+
     }
 
     _populate() {
