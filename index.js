@@ -83,13 +83,49 @@ class Board {
         this._calcElevation();
     }
 
-
-
     _calcElevation() {
-        let targetsArray;
+        let targetsArray = [];
         let pathLength
-        //this.elevation = new Uint16Array(this.board.length);
-        targetsArray = [Board.getRoot()];
+        pathLength = 1;
+        let done = false;
+        let current;
+        let newTargets = [];
+
+        //Getting all branch ends
+        for (let i = 0; i < this.board.length; i++) {
+            if ( getAdjacent(i, this.board, this.width, this.height).length === 1){
+                targetsArray.push(i);
+            }
+        }
+
+        while (!done) {
+            for (let i = 0; i < targetsArray.length; i++) {
+                let sides = getAdjacent(targetsArray[i], this.board, this.width, this.height);
+                for (let j = 0; j < sides.length; j++) {
+                   switch (sides[j]) {
+                       case 2:
+                           current = targetsArray[i] - this.width;
+                           break;
+                       case 3:
+                           current = targetsArray[i] + 1;
+                           break;
+                       case 4:
+                           current = targetsArray[i] + this.width;
+                           break;
+                       case 5:
+                           current = targetsArray[i] - 1;
+                           break;
+                       default:
+                           break;
+                   }
+                }
+            }
+        }
+    }
+
+    aaaa() {
+        let pathLength
+        let targetsArray = [Board.getRoot()];
         pathLength = 1;
         let done = false;
         let current;
@@ -132,16 +168,6 @@ class Board {
             newTargets = [];
             pathLength++;
         }
-        //Inverting height values
-        // y = pathLength - x + 1
-        // x + (y-x)
-        pathLength--;
-        for (let i = 0; i < this.board.length; i++) {
-            if (this.board[i] !== 0 && this.elevation[i] !== 0) {
-                this.elevation[i] = this.elevation[i] + ((pathLength - this.elevation[i] + 1) - this.elevation[i]);
-            }
-        }
-
     }
 
     _populate() {
