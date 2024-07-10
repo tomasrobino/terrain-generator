@@ -85,9 +85,7 @@ class Board {
 
     _calcElevation() {
         let targetsArray = [];
-        let done = false;
         let forksArray = [];
-        let newTargets = [];
 
         //Getting all branch ends
         for (let i = 0; i < this.board.length; i++) {
@@ -96,9 +94,9 @@ class Board {
                 this.elevation[i] = 1;
             }
         }
+        printBoard(this.board, this.width);
 
-        while (!done) {
-            let i = 0;
+        for (let i = 0; i < targetsArray.length; i++) {
             let flag = true;
             let pathLength = 2;
             while (flag) {
@@ -143,17 +141,39 @@ class Board {
                     } else if (forkIndex !== -1) {
                         this.elevation[next] = Math.max(this.elevation[next], pathLength);
                         if (nextAdj.length === 3) {
-
-                        }
-                        if (pathLength > this.elevation[next]) {
-                            this.elevation[next] = pathLength;
+                            forksArray.splice(forkIndex, 1);
                             moved = true;
-                            break;
+                            targetsArray[i] = next;
+                        } else {
+                            let adjCounter = 0;
+                            for (let g = 0; g < nextAdj.length; g++) {
+                                switch (nextAdj[g]) {
+                                    case 2:
+                                        if (this.elevation[next - this.width] !== 0) adjCounter++;
+                                        break;
+                                    case 3:
+                                        if (this.elevation[next + 1] !== 0) adjCounter++;
+                                        break;
+                                    case 4:
+                                        if (this.elevation[next + this.width] !== 0) adjCounter++;
+                                        break;
+                                    case 5:
+                                        if (this.elevation[next - 1] !== 0) adjCounter++;
+                                        break;
+                                    default:
+                                        printBoard(this.board, this.width);
+                                        console.log("--------------------");
+                                        printElevation(this.elevation, this.width);
+                                        throw new Error("nextAdjs element with invalid number");
+                                }
+                            }
+
+                            if (adjCounter === 3) {
+                                forksArray.splice(forkIndex, 1);
+                                moved = true;
+                                targetsArray[i] = next;
+                            }
                         }
-                        //newTargets.push(forksArray[forkIndex]);
-                        //forksArray.splice(forkIndex, 1);
-                        //pathLength = this.elevation[current];
-                        moved = true;
                         break;
                     }
                 }
@@ -162,8 +182,10 @@ class Board {
                     flag = false;
                 }
             }
-            i++;
         }
+
+
+
     }
 
     aaaa() {
