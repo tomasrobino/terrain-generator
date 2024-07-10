@@ -85,9 +85,7 @@ class Board {
 
     _calcElevation() {
         let targetsArray = [];
-        let pathLength = 2;
         let done = false;
-        let current;
         let forksArray = [];
         let newTargets = [];
 
@@ -102,44 +100,64 @@ class Board {
         while (!done) {
             let i = 0;
             let flag = true;
+            let pathLength = 2;
             while (flag) {
                 let sides = getAdjacent(targetsArray[i], this.board, this.width, this.height);
                 let moved = false;
                 for (let j = 0; j < sides.length; j++) {
+                    let next;
                     //Translating getAdjacent result to actual index
                     switch (sides[j]) {
                         case 2:
-                            current = targetsArray[i] - this.width;
+                            next = targetsArray[i] - this.width;
                             break;
                         case 3:
-                            current = targetsArray[i] + 1;
+                            next = targetsArray[i] + 1;
                             break;
                         case 4:
-                            current = targetsArray[i] + this.width;
+                            next = targetsArray[i] + this.width;
                             break;
                         case 5:
-                            current = targetsArray[i] - 1;
+                            next = targetsArray[i] - 1;
                             break;
                         default:
                             printBoard(this.board, this.width);
                             console.log("--------------------");
                             printElevation(this.elevation, this.width);
                             throw new Error("adjs element with invalid number");
-                            break;
                     }
 
-                    let forkIndex = forksArray.findIndex(value => value === current);
-                    if (this.elevation[current] === 0) {
-                        this.elevation[current] = pathLength;
-                        pathLength++;
+                    let forkIndex = forksArray.findIndex(value => value === next);
+                    let nextAdj = getAdjacent(next, this.board, this.width, this.height);
+                    if (this.elevation[next] === 0) {
+                        this.elevation[next] = pathLength;
+                        //Detecting and adding fork
+                        if (nextAdj.length > 2) {
+                            forksArray.push(next);
+                        } else {
+                            targetsArray[i] = next;
+                            moved = true;
+                        }
+                        break;
+                    //If next is a fork
+                    } else if (forkIndex !== -1) {
+                        this.elevation[next] = Math.max(this.elevation[next], pathLength);
+                        if (nextAdj.length === 3) {
+
+                        }
+                        if (pathLength > this.elevation[next]) {
+                            this.elevation[next] = pathLength;
+                            moved = true;
+                            break;
+                        }
+                        //newTargets.push(forksArray[forkIndex]);
+                        //forksArray.splice(forkIndex, 1);
+                        //pathLength = this.elevation[current];
                         moved = true;
                         break;
-                    } else if (forkIndex !== -1) {
-                        //Attempt to solve fork
-
                     }
                 }
-
+                pathLength++;
                 if (!moved) {
                     flag = false;
                 }
