@@ -45,8 +45,10 @@ function printElevation(elevation: Uint16Array, currentWidth: number) {
             let element: number = elevation[x*currentWidth + z];
             let expression: string;
             if (element !== 0) {
-                expression = `\u{1b}[91m${element}  \u{1b}[0m`;
-            } else expression = `\u{1b}[30m${element}  \u{1b}[0m`;
+                if (element<10) {
+                    expression = `\u{1b}[91m${element}\u00A0  \u{1b}[0m`;
+                } else expression = `\u{1b}[91m${element}  \u{1b}[0m`;
+            } else expression = `\u{1b}[30m${element}\u00A0  \u{1b}[0m`;
             arr.push(expression);
         }
         console.log(arr.join(""));
