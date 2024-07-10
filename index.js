@@ -85,16 +85,17 @@ class Board {
 
     _calcElevation() {
         let targetsArray = [];
-        let pathLength
-        pathLength = 1;
+        let pathLength = 2;
         let done = false;
         let current;
+        let forksArray = [];
         let newTargets = [];
 
         //Getting all branch ends
         for (let i = 0; i < this.board.length; i++) {
             if ( getAdjacent(i, this.board, this.width, this.height).length === 1){
                 targetsArray.push(i);
+                this.elevation[i] = 1;
             }
         }
 
@@ -102,22 +103,35 @@ class Board {
             for (let i = 0; i < targetsArray.length; i++) {
                 let sides = getAdjacent(targetsArray[i], this.board, this.width, this.height);
                 for (let j = 0; j < sides.length; j++) {
-                   switch (sides[j]) {
-                       case 2:
-                           current = sides[i] - this.width;
-                           break;
-                       case 3:
-                           current = sides[i] + 1;
-                           break;
-                       case 4:
-                           current = sides[i] + this.width;
-                           break;
-                       case 5:
-                           current = sides[i] - 1;
-                           break;
-                       default:
-                           break;
-                   }
+                    //Translating getAdjacent result to actual index
+                    switch (sides[j]) {
+                        case 2:
+                            current = targetsArray[i] - this.width;
+                            break;
+                        case 3:
+                            current = targetsArray[i] + 1;
+                            break;
+                        case 4:
+                            current = targetsArray[i] + this.width;
+                            break;
+                        case 5:
+                            current = targetsArray[i] - 1;
+                            break;
+                        default:
+                            printBoard(this.board, this.width);
+                            console.log("--------------------");
+                            printElevation(this.elevation, this.width);
+                            throw new Error("adjs element with invalid number");
+                            break;
+                    }
+
+                    let forkIndex = forksArray.findIndex(value => value === current);
+                    if (this.elevation[current] === 0) {
+                        newTargets.push(current);
+                        this.elevation[current] = pathLength;
+                    } else if (forkIndex !== -1) {
+
+                    }
                 }
             }
         }
