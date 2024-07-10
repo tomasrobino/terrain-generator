@@ -100,8 +100,11 @@ class Board {
         }
 
         while (!done) {
-            for (let i = 0; i < targetsArray.length; i++) {
+            let i = 0;
+            let flag = true;
+            while (flag) {
                 let sides = getAdjacent(targetsArray[i], this.board, this.width, this.height);
+                let moved = false;
                 for (let j = 0; j < sides.length; j++) {
                     //Translating getAdjacent result to actual index
                     switch (sides[j]) {
@@ -127,13 +130,21 @@ class Board {
 
                     let forkIndex = forksArray.findIndex(value => value === current);
                     if (this.elevation[current] === 0) {
-                        newTargets.push(current);
                         this.elevation[current] = pathLength;
+                        pathLength++;
+                        moved = true;
+                        break;
                     } else if (forkIndex !== -1) {
+                        //Attempt to solve fork
 
                     }
                 }
+
+                if (!moved) {
+                    flag = false;
+                }
             }
+            i++;
         }
     }
 
