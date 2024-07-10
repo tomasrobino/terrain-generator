@@ -1,5 +1,5 @@
 const sharp = require("sharp");
-const {printElevation, printBoard, randomSingle, getAdjacent} = require("./utilities");
+const {printBoard, printElevation, randomSingle, getAdjacent} = require("./utilities")
 
 
 const WIDTH = parseInt(process.argv[2]);
@@ -9,14 +9,22 @@ const STAGES_AMOUNT = parseInt(process.argv[5]);
 
 
 class Board {
-    static blockCounter = 0;
-    static root;
+    private static blockCounter = 0;
+    private static root: number;
+    public readonly height: number;
+    public readonly width: number;
+    private origin: Uint8Array;
+    private originElevation: Uint16Array;
+    private originHeight: number;
+    public readonly originWidth: number;
+    public readonly board: Uint8Array;
+    public readonly elevation: Uint16Array;
 
     static getBlockCounter() {
         return this.blockCounter;
     }
 
-    static setBlockCounter(value) {
+    static setBlockCounter(value: number) {
         this.blockCounter+=value;
     }
 
@@ -28,11 +36,11 @@ class Board {
         return this.root;
     }
 
-    static setRoot(value) {
+    static setRoot(value: number) {
         this.root = value;
     }
 
-    constructor(height, width, origin = [1], originElevation = [0], originHeight = 1, originWidth = 1) {
+    constructor(height: number, width: number, origin: Uint8Array = new Uint8Array([1]), originElevation: Uint16Array = new Uint16Array([0]), originHeight: number = 1, originWidth: number = 1) {
         this.height = height;
         this.width = width;
         this.origin = new Uint8Array(origin);
@@ -266,7 +274,7 @@ class Board {
         }
     }
 
-    saveToFile(destination) {
+    saveToFile(destination: string) {
         let boardForImage = new Uint8Array(this.board);
         for (let g = 0; g < boardForImage.length; g++) {
             if (boardForImage[g] === 1) {
