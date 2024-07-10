@@ -104,16 +104,16 @@ class Board {
                 for (let j = 0; j < sides.length; j++) {
                    switch (sides[j]) {
                        case 2:
-                           current = targetsArray[i] - this.width;
+                           current = sides[i] - this.width;
                            break;
                        case 3:
-                           current = targetsArray[i] + 1;
+                           current = sides[i] + 1;
                            break;
                        case 4:
-                           current = targetsArray[i] + this.width;
+                           current = sides[i] + this.width;
                            break;
                        case 5:
-                           current = targetsArray[i] - 1;
+                           current = sides[i] - 1;
                            break;
                        default:
                            break;
