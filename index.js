@@ -1,4 +1,5 @@
 const sharp = require("sharp");
+const {printElevation, printBoard, randomSingle} = require("./utilities");
 
 
 const WIDTH = parseInt(process.argv[2]);
@@ -7,24 +8,9 @@ const PERCENTAGE_FILLED = parseFloat(process.argv[4]);
 const STAGES_AMOUNT = parseInt(process.argv[5]);
 
 
-//Returns one random integer, bounded by max and min
-function randomSingle(max, min = 0) {
-    return Math.floor( Math.random() * (max-min) + min );
-}
-
-//Only for testing
-function printBoard(board, currentWidth) {
-    for (let x = 0; x < Math.floor(board.length/currentWidth); x++) {
-        let arr = [];
-        for (let z = 0; z < currentWidth; z++) {
-            arr.push(board[x*currentWidth + z]);
-        }
-        console.log(arr);
-    }
-}
-
 class Board {
     static blockCounter = 0;
+    static root;
 
     static getBlockCounter() {
         return this.blockCounter;
@@ -38,23 +24,37 @@ class Board {
         this.blockCounter++;
     }
 
-    constructor(height, width, root, rootElevation, rootHeight, rootWidth) {
+    static getRoot() {
+        return this.root;
+    }
+
+    static setRoot(value) {
+        this.root = value;
+    }
+
+    constructor(height, width, origin = [1], originElevation = [0], originHeight = 1, originWidth = 1) {
         this.height = height;
         this.width = width;
-        this.root = new Uint8Array(root);
-        this.rootElevation = new Uint16Array(rootElevation);
-        this.rootHeight = rootHeight;
-        this.rootWidth = rootWidth;
+        this.origin = new Uint8Array(origin);
+        this.originElevation = originElevation;
+        this.originHeight = originHeight;
+        this.originWidth = originWidth;
         this.board = new Uint8Array(height*width);
+
         let offset = 0;
-        if (root.length===1) {
-            this.board[randomSingle(Math.floor((this.height*this.width)))] = 1;
+        if (origin.length===1) {
+            let random = randomSingle(Math.floor((this.height*this.width)));
+            this.board[random] = 1;
+            Board.setRoot(random);
             Board.addBlockCounter();
         } else {
-            for (let i = 0; i < root.length; i++) {
-                if (root[i] !== 0) {
-                    this.board[(2*i)+offset] = root[i];
-                    switch (root[i]) {
+            for (let i = 0; i < origin.length; i++) {
+                if (i === Board.getRoot()) {
+                    Board.setRoot((2*Board.getRoot())+offset);
+                }
+                if (origin[i] !== 0) {
+                    this.board[(2*i)+offset] = origin[i];
+                    switch (origin[i]) {
                         case 2:
                             this.board[(2*i)+offset-this.width] = 2;
                             break;
@@ -70,15 +70,108 @@ class Board {
                         default:
                             break;
                     }
+
+
                 }
-                if ((i+1)%this.rootWidth === 0) {
+                if ((i+1)%this.originWidth === 0) {
                     offset += this.width;
                 }
             }
         }
+        this.elevation = new Uint16Array(this.board.length);
+        this._populate();
+        this._calcElevation();
     }
 
-    populate() {
+    _getAdjacent(i, array, arrayWidth, arrayHeight) {
+        let coordY = Math.floor(i/arrayWidth);
+        let coordX = i%arrayWidth;
+        let answerArray = [];
+
+        //If there's a block above
+        if (coordY!==0 && array[i-arrayWidth] === 4) {
+            answerArray.push(2);
+        //If there's a block on the right
+        }
+        if (coordX!==arrayWidth-1 && array[i+1] === 5) {
+            answerArray.push(3)
+        //If there's a block below
+        }
+        if (coordY!==arrayHeight-1 && array[i+arrayWidth] === 2) {
+            answerArray.push(4)
+        //If there's a block on the left
+        }
+        if (coordX!==0 && array[i-1] === 3) {
+            answerArray.push(5)
+        }
+
+        //Adds block i points to
+        if (array[i] !== 1 && array[i] !== 0) {
+            answerArray.push(array[i])
+        }
+        return answerArray;
+    }
+
+    _calcElevation() {
+        let targetsArray;
+        let pathLength
+        //this.elevation = new Uint16Array(this.board.length);
+        targetsArray = [Board.getRoot()];
+        pathLength = 1;
+        let done = false;
+        let current;
+        let newTargets = [];
+
+        while (!done) {
+            for (let i = 0; i < targetsArray.length; i++) {
+                current = targetsArray[i];
+                if (this.elevation[current] === 0) {
+                    this.elevation[current] = pathLength;
+                } else continue;
+                let adjs = this._getAdjacent(current, this.board, this.width, this.height);
+
+                for (let g = 0; g < adjs.length; g++) {
+                    let aux;
+                    switch (adjs[g]) {
+                        case 2:
+                            aux = current-this.width;
+                            break;
+                        case 3:
+                            aux = current+1;
+                            break;
+                        case 4:
+                            aux = current+this.width;
+                            break;
+                        case 5:
+                            aux = current-1;
+                            break;
+                        default:
+                            printBoard(this.board, this.width);
+                            console.log("--------------------");
+                            printElevation(this.elevation, this.width);
+                            throw new Error("adjs element with invalid number");
+                    }
+                    if (this.board[aux] !== 0 && this.elevation[aux] === 0 && !newTargets.includes(aux)) newTargets.push(aux);
+                }
+            }
+            targetsArray = Array.from(newTargets);
+            if (targetsArray.length === 0) done = true;
+            newTargets = [];
+            pathLength++;
+        }
+        //Inverting height values
+        // y = pathLength - x + 1
+        // x + (y-x)
+        pathLength--;
+        for (let i = 0; i < this.board.length; i++) {
+            if (this.board[i] !== 0 && this.elevation[i] !== 0) {
+                this.elevation[i] = this.elevation[i] + ((pathLength - this.elevation[i] + 1) - this.elevation[i]);
+            }
+        }
+
+    }
+
+    _populate() {
         for (let k = 0; k < this.height*this.width*PERCENTAGE_FILLED - Board.getBlockCounter(); k++) {
             let randomFlag = true;
             let random;
@@ -87,9 +180,9 @@ class Board {
                 if (this.board[random] === 0) {
                     randomFlag = false;
                 }
-                
+
             } while (randomFlag);
-            
+
             //Moving new block
             let flag = true;
             //Check if adjacent to other block
@@ -161,17 +254,17 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
+        printElevation(this.elevation, this.width)
     }
 }
 
 
 let boardArray = [];
-boardArray[0] = new Board(HEIGHT, WIDTH, [1], [0], 1, 1);
-boardArray[0].populate();
+boardArray[0] = new Board(HEIGHT, WIDTH);
 boardArray[0].saveToFile("results/stage1.gif");
 
+
 for (let i = 1; i < STAGES_AMOUNT; i++) {
-    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, [], boardArray[i-1].height, boardArray[i-1].width);
-    boardArray[i].populate();
+    boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, boardArray[i-1].elevation, boardArray[i-1].height, boardArray[i-1].width);
     boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
 }
