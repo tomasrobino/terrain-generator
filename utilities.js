@@ -49,6 +49,36 @@ function printElevation(elevation, currentWidth) {
     }
 }
 
+function getAdjacent(i, array, arrayWidth, arrayHeight) {
+    let coordY = Math.floor(i/arrayWidth);
+    let coordX = i%arrayWidth;
+    let answerArray = [];
+
+    //If there's a block above
+    if (coordY!==0 && array[i-arrayWidth] === 4) {
+        answerArray.push(2);
+        //If there's a block on the right
+    }
+    if (coordX!==arrayWidth-1 && array[i+1] === 5) {
+        answerArray.push(3)
+        //If there's a block below
+    }
+    if (coordY!==arrayHeight-1 && array[i+arrayWidth] === 2) {
+        answerArray.push(4)
+        //If there's a block on the left
+    }
+    if (coordX!==0 && array[i-1] === 3) {
+        answerArray.push(5)
+    }
+
+    //Adds block i points to
+    if (array[i] !== 1 && array[i] !== 0) {
+        answerArray.push(array[i])
+    }
+    return answerArray;
+}
+
 exports.randomSingle = randomSingle;
+exports.getAdjacent = getAdjacent;
 exports.printBoard = printBoard;
 exports.printElevation = printElevation;
