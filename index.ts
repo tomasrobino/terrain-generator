@@ -286,11 +286,15 @@ class Board {
     }
 
     saveElevationToFile(destination: string) {
-        const boardForImage = new Uint8Array(this.board);
-        const max = Math.max(...boardForImage);
+        const boardForImage = new Uint8Array(this.elevation);
+        const max: number = Math.max(...boardForImage);
         const division: number = 256/max;
         for (let i = 0; i < boardForImage.length; i++) {
-            boardForImage[i] = this.board[i]*division;
+            if (boardForImage[i] !== 0) {
+                const res = boardForImage[i] * division - 1;
+                if (res > 255) throw new Error("Invalid res value: " + res + ", max value: " + max + ", elevation value: " + this.elevation[i]);
+                boardForImage[i] = res;
+            }
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
