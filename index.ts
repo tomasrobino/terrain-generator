@@ -285,6 +285,14 @@ class Board {
         img.toFile(destination);
         printElevation(this.elevation, this.width)
     }
+
+    saveElevationToFile(destination: string) {
+        const boardForImage = new Uint8Array(this.board);
+        const max = Math.max(...boardForImage);
+        let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
+        img.toFile(destination);
+        printElevation(this.elevation, this.width)
+    }
 }
 
 
