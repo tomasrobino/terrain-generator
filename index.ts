@@ -283,17 +283,32 @@ class Board {
         }
         let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
         img.toFile(destination);
-        printElevation(this.elevation, this.width)
+    }
+
+    saveElevationToFile(destination: string) {
+        const boardForImage = new Uint8Array(this.elevation);
+        const max: number = Math.max(...boardForImage);
+        const division: number = 256/max;
+        for (let i = 0; i < boardForImage.length; i++) {
+            if (boardForImage[i] !== 0) {
+                const res = boardForImage[i] * division - 1;
+                if (res > 255) throw new Error("Invalid res value: " + res + ", max value: " + max + ", elevation value: " + this.elevation[i]);
+                boardForImage[i] = res;
+            }
+        }
+        let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
+        img.toFile(destination);
     }
 }
 
 
 let boardArray = [];
 boardArray[0] = new Board(HEIGHT, WIDTH);
-boardArray[0].saveToFile("results/stage1.gif");
-
+boardArray[0].saveToFile("results/board/stage1.gif");
+boardArray[0].saveElevationToFile("results/elevation/stage1.gif");
 
 for (let i = 1; i < STAGES_AMOUNT; i++) {
     boardArray[i] = new Board(boardArray[i-1].height*2, boardArray[i-1].width*2, boardArray[i-1].board, boardArray[i-1].elevation, boardArray[i-1].height, boardArray[i-1].width);
-    boardArray[i].saveToFile("results/stage"+(i+1)+".gif");
+    boardArray[i].saveToFile("results/board/stage"+(i+1)+".gif");
+    boardArray[i].saveElevationToFile("results/elevation/stage"+(i+1)+".gif");
 }
