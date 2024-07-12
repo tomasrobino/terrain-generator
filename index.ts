@@ -7,6 +7,9 @@ const HEIGHT = parseInt(process.argv[3]);
 const PERCENTAGE_FILLED = parseFloat(process.argv[4]);
 const STAGES_AMOUNT = parseInt(process.argv[5]);
 
+function formula(x: number): number {
+    return 1 - 1 / (1 + x);
+}
 
 class Board {
     private static blockCounter = 0;
@@ -195,9 +198,6 @@ class Board {
                 }
             }
         }
-
-
-
     }
 
     _populate() {
