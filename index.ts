@@ -50,19 +50,19 @@ class Board {
         this.board = new Uint8Array(height*width);
 
         let offset = 0;
-        if (origin.length===1) {
+        if (this.origin.length===1) {
             let random = randomSingle(Math.floor((this.height*this.width)));
             this.board[random] = 1;
             Board.setRoot(random);
             Board.addBlockCounter();
         } else {
-            for (let i = 0; i < origin.length; i++) {
+            for (let i = 0; i < this.origin.length; i++) {
                 if (i === Board.getRoot()) {
                     Board.setRoot((2*Board.getRoot())+offset);
                 }
-                if (origin[i] !== 0) {
-                    this.board[(2*i)+offset] = origin[i];
-                    switch (origin[i]) {
+                if (this.origin[i] !== 0) {
+                    this.board[(2*i)+offset] = this.origin[i];
+                    switch (this.origin[i]) {
                         case 2:
                             this.board[(2*i)+offset-this.width] = 2;
                             break;
@@ -92,8 +92,8 @@ class Board {
     }
 
     _calcElevation() {
-        let targetsArray = [];
-        let forksArray = [];
+        let targetsArray: number[] = [];
+        let forksArray: number[] = [];
 
         //Getting all branch ends
         for (let i = 0; i < this.board.length; i++) {
@@ -104,12 +104,12 @@ class Board {
         }
 
         for (let i = 0; i < targetsArray.length; i++) {
-            let flag = true;
-            let pathLength = 2;
+            let flag: boolean = true;
+            let pathLength: number = 2;
             while (flag) {
                 let sides = getAdjacent(targetsArray[i], this.board, this.width, this.height);
-                let moved = false;
-                for (let j = 0; j < sides.length; j++) {
+                let moved: boolean = false;
+                for (let j: number = 0; j < sides.length; j++) {
                     let next;
                     //Translating getAdjacent result to actual index
                     switch (sides[j]) {
@@ -132,7 +132,7 @@ class Board {
                             throw new Error("adjs element with invalid number");
                     }
 
-                    let forkIndex = forksArray.findIndex(value => value === next);
+                    let forkIndex: number = forksArray.findIndex(value => value === next);
                     let nextAdj = getAdjacent(next, this.board, this.width, this.height);
                     if (this.elevation[next] === 0) {
                         this.elevation[next] = pathLength;
@@ -155,7 +155,7 @@ class Board {
                             targetsArray[i] = next;
                         } else {
                             //If four-way fork
-                            let adjCounter = 0;
+                            let adjCounter: number = 0;
                             //Translating getAdjacent result to actual index
                             for (let g = 0; g < nextAdj.length; g++) {
                                 //Checks amount of sides already done
@@ -202,7 +202,7 @@ class Board {
 
     _populate() {
         for (let k = 0; k < this.height*this.width*PERCENTAGE_FILLED - Board.getBlockCounter(); k++) {
-            let randomFlag = true;
+            let randomFlag: boolean = true;
             let random;
             do {
                 random = randomSingle(this.height*this.width);
@@ -213,11 +213,11 @@ class Board {
             } while (randomFlag);
 
             //Moving new block
-            let flag = true;
+            let flag: boolean = true;
             //Check if adjacent to other block
             do {
-                let coordY = Math.floor(random/this.width);
-                let coordX = random%this.width;
+                let coordY: number = Math.floor(random/this.width);
+                let coordX: number = random%this.width;
                 //If there's a block above
                 if (coordY!==0 && this.board[random-this.width] !== 0) {
                     this.board[random] = 2;
@@ -275,7 +275,7 @@ class Board {
     }
 
     saveToFile(destination: string) {
-        let boardForImage = new Uint8Array(this.board);
+        let boardForImage: Uint8Array = new Uint8Array(this.board);
         for (let g = 0; g < boardForImage.length; g++) {
             if (boardForImage[g] === 1) {
                 boardForImage[g] = 100;
@@ -286,12 +286,12 @@ class Board {
     }
 
     saveElevationToFile(destination: string) {
-        const boardForImage = new Uint8Array(this.elevation);
+        const boardForImage: Uint8Array = new Uint8Array(this.elevation);
         const max: number = Math.max(...boardForImage);
         const division: number = 256/max;
         for (let i = 0; i < boardForImage.length; i++) {
             if (boardForImage[i] !== 0) {
-                const res = boardForImage[i] * division - 1;
+                const res: number = boardForImage[i] * division - 1;
                 if (res > 255) throw new Error("Invalid res value: " + res + ", max value: " + max + ", elevation value: " + this.elevation[i]);
                 boardForImage[i] = res;
             }
