@@ -274,6 +274,40 @@ class Board {
         }
     }
 
+    _linearInterpolation(i) {
+        const adjs: number[] = getAdjacent(i, this.origin, this.originWidth, this.originHeight);
+        const ratio: number = 1/adjs.length;
+        const resArr: number[] = [];
+        let aux: number;
+        for (let j: number = 0; j < adjs.length; j++) {
+            switch (adjs[j]) {
+                case 2:
+                    aux = i - this.width;
+                    resArr.push(aux*ratio);
+                    break;
+                case 3:
+                    aux = i + 1;
+                    resArr.push(aux*ratio);
+                    break;
+                case 4:
+                    aux = i + this.width;
+                    resArr.push(aux*ratio);
+                    break;
+                case 5:
+                    aux = i - 1;
+                    resArr.push(aux*ratio);
+                    break;
+                default:
+                    printBoard(this.board, this.width);
+                    console.log("--------------------");
+                    printElevation(this.elevation, this.width);
+                    throw new Error("adjs element with invalid number");
+            }
+        }
+
+
+    }
+
     saveToFile(destination: string) {
         let boardForImage: Uint8Array = new Uint8Array(this.board);
         for (let g = 0; g < boardForImage.length; g++) {
