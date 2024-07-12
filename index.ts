@@ -275,8 +275,16 @@ class Board {
     }
 
     _linearInterpolation(i) {
-        const ratio: number = 1/getAdjacent(i, this.origin, this.originWidth, this.originHeight).length;
-        return [i, i+1, i+this.originWidth, i+this.originWidth+1].reduce((acc, val) => acc + val*ratio);
+        const adjs: number[] = getAdjacent(i, this.origin, this.originWidth, this.originHeight);
+        const ratio: number = 1/adjs.length;
+        const resArr: number[] = [i];
+        if (i < this.originWidth-1) resArr.push(i+1);
+        if (i < this.originHeight-1) {
+            resArr.push(i+this.originWidth);
+            if (i < this.originWidth-1) resArr.push(i+this.originWidth+1);
+        }
+
+        return resArr.reduce((acc, val) => acc + val*ratio);
     }
 
     saveToFile(destination: string) {
