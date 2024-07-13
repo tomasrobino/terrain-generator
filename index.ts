@@ -302,11 +302,10 @@ class Board {
         const boardForImage: Uint8Array = new Uint8Array(this.elevation);
         const max: number = Math.max(...boardForImage);
         const division: number = 256/max;
-        printElevation(this.elevation, this.width);
         for (let i = 0; i < boardForImage.length; i++) {
             if (boardForImage[i] !== 0) {
                 const res: number = boardForImage[i] * division - 1;
-                if (res > 255) throw new Error("Invalid res value: " + res + ", max value: " + max + ", elevation value: " + this.elevation[i]);
+                if (res > 255 || res < 0) throw new Error("Invalid res value: " + res + ", max value: " + max + ", elevation value: " + this.elevation[i]);
                 boardForImage[i] = res;
             }
         }
