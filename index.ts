@@ -16,9 +16,9 @@ class Board {
     private static root: number;
     public readonly height: number;
     public readonly width: number;
-    private origin: Uint8Array;
-    private originElevation: Uint16Array;
-    private originHeight: number;
+    private readonly origin: Uint8Array;
+    private readonly originElevation: Uint16Array;
+    private readonly originHeight: number;
     public readonly originWidth: number;
     public readonly board: Uint8Array;
     public readonly elevation: Uint16Array;
@@ -284,7 +284,7 @@ class Board {
             if (i < this.originWidth-1) resArr.push(i+this.originWidth+1);
         }
 
-        return resArr.reduce((acc, val) => acc + val*ratio);
+        return formula(resArr.reduce((acc, val) => acc + this.originElevation[val]*ratio));
     }
 
     saveToFile(destination: string) {
@@ -302,6 +302,7 @@ class Board {
         const boardForImage: Uint8Array = new Uint8Array(this.elevation);
         const max: number = Math.max(...boardForImage);
         const division: number = 256/max;
+        printElevation(this.elevation, this.width);
         for (let i = 0; i < boardForImage.length; i++) {
             if (boardForImage[i] !== 0) {
                 const res: number = boardForImage[i] * division - 1;
