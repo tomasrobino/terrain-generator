@@ -97,12 +97,19 @@ class Board {
     _calcElevation() {
         let targetsArray: number[] = [];
         let forksArray: number[] = [];
-
+        let auxElevation: Uint16Array = new Uint16Array(this.elevation.length);
         //Getting all branch ends
         for (let i = 0; i < this.board.length; i++) {
             if ( getAdjacent(i, this.board, this.width, this.height).length === 1){
                 targetsArray.push(i);
-                this.elevation[i] = 1;
+                auxElevation[i] = 1;
+                /*
+                if (this.origin.length !== 1) {
+                    this.elevation[i] = this._linearInterpolation(i);
+                }
+
+                 */
+
             }
         }
 
@@ -131,14 +138,20 @@ class Board {
                         default:
                             printBoard(this.board, this.width);
                             console.log("--------------------");
-                            printElevation(this.elevation, this.width);
+                            printElevation(auxElevation, this.width);
                             throw new Error("adjs element with invalid number");
                     }
 
                     let forkIndex: number = forksArray.findIndex(value => value === next);
                     let nextAdj = getAdjacent(next, this.board, this.width, this.height);
-                    if (this.elevation[next] === 0) {
-                        this.elevation[next] = pathLength;
+                    if (auxElevation[next] === 0) {
+                        auxElevation[next] = pathLength;
+                        /*
+                        if (this.origin.length !== 1) {
+                            this.elevation[next] = this._linearInterpolation(next);
+                        }
+
+                         */
                         //Detecting and adding fork
                         if (nextAdj.length > 2) {
                             forksArray.push(next);
@@ -150,7 +163,7 @@ class Board {
                     //If next is a fork
                     } else if (forkIndex !== -1) {
                         //Set maximum as path
-                        this.elevation[next] = Math.max(this.elevation[next], pathLength);
+                        auxElevation[next] = Math.max(auxElevation[next], pathLength);
                         //If three-way fork, solve it
                         if (nextAdj.length === 3) {
                             forksArray.splice(forkIndex, 1);
@@ -164,21 +177,21 @@ class Board {
                                 //Checks amount of sides already done
                                 switch (nextAdj[g]) {
                                     case 2:
-                                        if (this.elevation[next - this.width] !== 0) adjCounter++;
+                                        if (auxElevation[next - this.width] !== 0) adjCounter++;
                                         break;
                                     case 3:
-                                        if (this.elevation[next + 1] !== 0) adjCounter++;
+                                        if (auxElevation[next + 1] !== 0) adjCounter++;
                                         break;
                                     case 4:
-                                        if (this.elevation[next + this.width] !== 0) adjCounter++;
+                                        if (auxElevation[next + this.width] !== 0) adjCounter++;
                                         break;
                                     case 5:
-                                        if (this.elevation[next - 1] !== 0) adjCounter++;
+                                        if (auxElevation[next - 1] !== 0) adjCounter++;
                                         break;
                                     default:
                                         printBoard(this.board, this.width);
                                         console.log("--------------------");
-                                        printElevation(this.elevation, this.width);
+                                        printElevation(auxElevation, this.width);
                                         throw new Error("nextAdjs element with invalid number");
                                 }
                             }
