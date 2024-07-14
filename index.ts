@@ -211,6 +211,10 @@ class Board {
                 }
             }
         }
+
+        for (let i = 0; i < this.elevation.length; i++) {
+            this.elevation[i] = auxElevation[i];
+        }
     }
 
     _populate() {
