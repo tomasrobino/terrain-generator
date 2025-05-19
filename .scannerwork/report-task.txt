@@ -2,5 +2,5 @@ projectKey=terrain-generator
 serverUrl=http://localhost:9000
 serverVersion=25.5.0.107428
 dashboardUrl=http://localhost:9000/dashboard?id=terrain-generator
-ceTaskId=a54c799b-9696-4e25-917b-e5dd4f453222
-ceTaskUrl=http://localhost:9000/api/ce/task?id=a54c799b-9696-4e25-917b-e5dd4f453222
+ceTaskId=383b93ec-58b4-4ce8-a47f-ceff8ec84dea
+ceTaskUrl=http://localhost:9000/api/ce/task?id=383b93ec-58b4-4ce8-a47f-ceff8ec84dea
