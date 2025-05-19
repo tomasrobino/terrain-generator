@@ -301,7 +301,7 @@ class Board {
             if (i < this.originWidth-1) resArr.push(i+this.originWidth+1);
         }
 
-        return formula(resArr.reduce((acc, val) => acc + this.originElevation[val]*ratio));
+        return formula(resArr.reduce((acc, val) => acc + this.originElevation[val]*ratio, 0));
     }
 
     saveToFile(destination: string) {
