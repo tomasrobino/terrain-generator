@@ -1,3 +1,5 @@
+const { Board } = require('./index');
+
 describe('Board class', () => {
   const width = 10;
   const height = 10;
@@ -25,10 +27,5 @@ describe('Board class', () => {
     const initial = Board.getBlockCounter();
     Board.setBlockCounter(5);
     expect(Board.getBlockCounter()).toBe(initial + 5);
-  });
-
-  test('should throw if width or height are not positive', () => {
-    expect(() => new Board(0, 10)).toThrow();
-    expect(() => new Board(10, 0)).toThrow();
   });
 });

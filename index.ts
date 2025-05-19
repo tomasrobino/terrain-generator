@@ -11,7 +11,7 @@ function formula(x: number): number {
     return 1 - 1 / (1 + x);
 }
 
-class Board {
+export class Board {
     private static blockCounter = 0;
     private static root: number;
     public readonly height: number;
@@ -311,8 +311,10 @@ class Board {
                 boardForImage[g] = 100;
             } else if (boardForImage[g] !== 0) boardForImage[g] = 255;
         }
-        let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
-        img.toFile(destination);
+        if (boardForImage.length != 0) {
+            let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
+            img.toFile(destination);
+        }
     }
 
     saveElevationToFile(destination: string) {
@@ -326,8 +328,10 @@ class Board {
                 boardForImage[i] = res;
             }
         }
-        let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
-        img.toFile(destination);
+        if (boardForImage.length != 0) {
+            let img = sharp(boardForImage, {raw: { width: this.width, height: this.height, channels: 1 }});
+            img.toFile(destination);
+        }
     }
 }
 
